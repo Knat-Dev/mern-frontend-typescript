@@ -1,0 +1,18 @@
+query Posts($input: PaginationInput!) {
+  posts(input: $input) {
+    posts {
+      id
+      title
+      textSnippet
+      voteStatus
+      points
+      createdAt
+      updatedAt
+      creator {
+        id
+        username
+      }
+    }
+    hasMore
+  }
+}
