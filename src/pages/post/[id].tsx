@@ -1,12 +1,11 @@
 import {
   Alert,
-  AlertDescription,
   AlertIcon,
   AlertTitle,
   Box,
-  Flex,
   Grid,
   Heading,
+  Spinner,
 } from '@chakra-ui/core';
 import moment from 'moment';
 import { withUrqlClient } from 'next-urql';
@@ -33,8 +32,16 @@ const Post: React.FC<Props> = ({ post }) => {
 
   if (fetching || !data?.post)
     return (
-      <Layout>
-        <div>loading...</div>
+      <Layout horizontalCenter>
+        <Box textAlign="center">
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+          />
+        </Box>
       </Layout>
     );
 

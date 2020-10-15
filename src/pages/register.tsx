@@ -10,6 +10,7 @@ import {
   Heading,
   Input,
   Link,
+  useToast,
 } from '@chakra-ui/core';
 import Wrapper from '../components/Wrapper';
 import InputField from '../components/InputField';
@@ -20,11 +21,13 @@ import { useRouter } from 'next/router';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
+import SuccessToast from '../components/SuccessToast';
 interface Props {}
 
 const Register: React.FC<Props> = ({}) => {
   const router = useRouter();
   const [, register] = useRegisterMutation();
+  const toast = useToast();
 
   return (
     <Wrapper variant="small" horizontalCenter>
@@ -36,6 +39,16 @@ const Register: React.FC<Props> = ({}) => {
             setErrors(toErrorMap(response.data.register.errors));
           } else {
             router.push('/');
+            return toast({
+              position: 'bottom-left',
+              duration: 3000,
+              render: ({ onClose }) => (
+                <SuccessToast
+                  onClose={onClose}
+                  description="You've successfully registered and you are\n now signed in!"
+                />
+              ),
+            });
           }
         }}
       >

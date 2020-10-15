@@ -1,15 +1,18 @@
-import { Box, Button, Flex, Heading, Link } from '@chakra-ui/core';
+import { Box, Button, Flex, Heading, Link, useToast } from '@chakra-ui/core';
 import React from 'react';
 import NextLink from 'next/link';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { isServer } from '../utils/isServer';
 import Wrapper from './Wrapper';
+import SuccessToast from './SuccessToast';
 
 interface Props {}
 
 const Navbar: React.FC<Props> = ({}) => {
   const [{ data, fetching }] = useMeQuery();
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
+  const toast = useToast();
+
   let body: JSX.Element | null = null;
 
   if (fetching) body = null;
@@ -37,8 +40,20 @@ const Navbar: React.FC<Props> = ({}) => {
           variant="link"
           variantColor="#fff"
           mx={[2, 4]}
-          onClick={() => {
-            logout();
+          onClick={async () => {
+            const { error } = await logout();
+            if (!error) {
+              return toast({
+                position: 'bottom-left',
+                duration: 3000,
+                render: ({ onClose }) => (
+                  <SuccessToast
+                    onClose={onClose}
+                    description="You've successfully logged out!"
+                  />
+                ),
+              });
+            }
           }}
           size="sm"
         >

@@ -49,7 +49,7 @@ const PostItem: React.FC<Props> = ({ post }) => {
           </Text>
           <Text as="span"> on </Text>
           <Text as="span" color="gray.500">
-            {moment(post.createdAt).format('MMM Mo, YYYY HH:mm')}
+            {moment(post.createdAt).format('MMM Do, YYYY HH:mm')}
           </Text>
         </Box>
         <Box></Box>

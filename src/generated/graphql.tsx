@@ -66,8 +66,8 @@ export type PaginationInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createPost?: Maybe<Post>;
-  updatePost: Post;
+  createPost?: Maybe<PostResponse>;
+  updatePost: PostResponse;
   deletePost: Scalars['Boolean'];
   vote: Scalars['Boolean'];
   register: UserResponse;
@@ -120,6 +120,18 @@ export type MutationChangePasswordArgs = {
   input: ChangePasswordInput;
 };
 
+export type PostResponse = {
+  __typename?: 'PostResponse';
+  errors?: Maybe<Array<FieldError>>;
+  post?: Maybe<Post>;
+};
+
+export type FieldError = {
+  __typename?: 'FieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
 export type PostInput = {
   title: Scalars['String'];
   text: Scalars['String'];
@@ -129,12 +141,6 @@ export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
   user?: Maybe<User>;
-};
-
-export type FieldError = {
-  __typename?: 'FieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
 };
 
 export type RegisterInput = {
@@ -156,6 +162,11 @@ export type ChangePasswordInput = {
 export type RegularErrorFragment = (
   { __typename?: 'FieldError' }
   & Pick<FieldError, 'field' | 'message'>
+);
+
+export type RegularPostFragment = (
+  { __typename?: 'Post' }
+  & Pick<Post, 'id' | 'title' | 'text' | 'points' | 'createdAt' | 'updatedAt'>
 );
 
 export type RegularResponseFragment = (
@@ -195,8 +206,14 @@ export type CreatePostMutationVariables = Exact<{
 export type CreatePostMutation = (
   { __typename?: 'Mutation' }
   & { createPost?: Maybe<(
-    { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'title' | 'text' | 'points' | 'createdAt' | 'updatedAt'>
+    { __typename?: 'PostResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & RegularErrorFragment
+    )>>, post?: Maybe<(
+      { __typename?: 'Post' }
+      & RegularPostFragment
+    )> }
   )> }
 );
 
@@ -264,8 +281,14 @@ export type UpdatePostMutationVariables = Exact<{
 export type UpdatePostMutation = (
   { __typename?: 'Mutation' }
   & { updatePost: (
-    { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'title' | 'text' | 'textSnippet'>
+    { __typename?: 'PostResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & RegularErrorFragment
+    )>>, post?: Maybe<(
+      { __typename?: 'Post' }
+      & RegularPostFragment
+    )> }
   ) }
 );
 
@@ -329,6 +352,16 @@ export type PostsQuery = (
   ) }
 );
 
+export const RegularPostFragmentDoc = gql`
+    fragment RegularPost on Post {
+  id
+  title
+  text
+  points
+  createdAt
+  updatedAt
+}
+    `;
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
   field
@@ -369,15 +402,16 @@ export function useChangePasswordMutation() {
 export const CreatePostDocument = gql`
     mutation CreatePost($input: PostInput!) {
   createPost(input: $input) {
-    id
-    title
-    text
-    points
-    createdAt
-    updatedAt
+    errors {
+      ...RegularError
+    }
+    post {
+      ...RegularPost
+    }
   }
 }
-    `;
+    ${RegularErrorFragmentDoc}
+${RegularPostFragmentDoc}`;
 
 export function useCreatePostMutation() {
   return Urql.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument);
@@ -434,13 +468,16 @@ export function useRegisterMutation() {
 export const UpdatePostDocument = gql`
     mutation UpdatePost($id: String!, $title: String!, $text: String!) {
   updatePost(id: $id, title: $title, text: $text) {
-    id
-    title
-    text
-    textSnippet
+    errors {
+      ...RegularError
+    }
+    post {
+      ...RegularPost
+    }
   }
 }
-    `;
+    ${RegularErrorFragmentDoc}
+${RegularPostFragmentDoc}`;
 
 export function useUpdatePostMutation() {
   return Urql.useMutation<UpdatePostMutation, UpdatePostMutationVariables>(UpdatePostDocument);

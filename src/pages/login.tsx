@@ -1,4 +1,16 @@
-import { Box, Button, Flex, Heading, Link, Text } from '@chakra-ui/core';
+import {
+  Box,
+  Button,
+  CloseButton,
+  Flex,
+  Heading,
+  Icon,
+  IconButton,
+  Link,
+  SimpleGrid,
+  Text,
+  useToast,
+} from '@chakra-ui/core';
 import { Formik, Form } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
@@ -9,13 +21,15 @@ import { useLoginMutation } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import { toErrorMap } from '../utils/toErrorMap';
 import NextLink from 'next/link';
+import SuccessToast from '../components/SuccessToast';
 
 interface Props {}
 
 const Login: React.FC<Props> = ({}) => {
   const [, login] = useLoginMutation();
   const router = useRouter();
-  console.log(router.query);
+  const toast = useToast();
+
   return (
     <Wrapper horizontalCenter variant="small">
       <Formik
@@ -30,6 +44,16 @@ const Login: React.FC<Props> = ({}) => {
             if (typeof router.query.next === 'string')
               router.push(router.query.next);
             else router.push('/');
+            return toast({
+              position: 'bottom-left',
+              duration: 3000,
+              render: ({ onClose }) => (
+                <SuccessToast
+                  onClose={onClose}
+                  description="You've successfully signed in!"
+                />
+              ),
+            });
           }
         }}
       >

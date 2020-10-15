@@ -5,6 +5,7 @@ import {
   AlertTitle,
   Box,
   Button,
+  CircularProgress,
   CloseButton,
   Flex,
   Heading,
@@ -27,6 +28,7 @@ import { stringifyVariables } from 'urql';
 import VotingComponent from '../components/VotingComponent';
 import PostItem from '../components/PostItem';
 import Head from 'next/head';
+import Wrapper from '../components/Wrapper';
 
 const Index = () => {
   const [input, setInput] = useState({
@@ -81,7 +83,9 @@ const Index = () => {
             </Button>
           </NextLink>
           {!data && fetching ? (
-            <div>loading...</div>
+            <Box alignSelf="center">
+              <CircularProgress isIndeterminate color="blue" />
+            </Box>
           ) : !data ? (
             <div>{ErrorEl}</div>
           ) : (

@@ -1,15 +1,17 @@
-import { Box, Button } from '@chakra-ui/core';
+import { Box, Button, Spinner, useToast } from '@chakra-ui/core';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
 import React from 'react';
 import InputField from '../../../components/InputField';
 import Layout from '../../../components/Layout';
+import SuccessToast from '../../../components/SuccessToast';
 import {
   usePostQuery,
   useUpdatePostMutation,
 } from '../../../generated/graphql';
 import { createUrqlClient } from '../../../utils/createUrqlClient';
+import { toErrorMap } from '../../../utils/toErrorMap';
 
 interface Props {}
 
@@ -23,11 +25,20 @@ const EditPost: React.FC<Props> = () => {
       id,
     },
   });
+  const toast = useToast();
 
   if (fetching || !data?.post)
     return (
-      <Layout>
-        <div>loading...</div>
+      <Layout horizontalCenter>
+        <Box textAlign="center">
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+          />
+        </Box>
       </Layout>
     );
 
@@ -38,10 +49,25 @@ const EditPost: React.FC<Props> = () => {
       <Formik
         initialValues={{ id, title: data.post.title, text: data.post.text }}
         onSubmit={async (values, { setErrors }) => {
-          const { error } = await updatePost(values);
-          if (!error) {
-            router.back();
-          }
+          const response = await updatePost(values);
+          if (
+            !response.data?.updatePost?.errors &&
+            !response.error &&
+            response.data?.updatePost?.post
+          ) {
+            await router.push('/');
+            return toast({
+              position: 'bottom-left',
+              duration: 3000,
+              render: ({ onClose }) => (
+                <SuccessToast
+                  onClose={onClose}
+                  description="Your post was edited successfully!"
+                />
+              ),
+            });
+          } else if (response.data?.updatePost?.errors)
+            return setErrors(toErrorMap(response.data?.updatePost.errors));
         }}
       >
         {({ isSubmitting }) => (
