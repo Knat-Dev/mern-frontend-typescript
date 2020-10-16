@@ -8,11 +8,12 @@ import {
   FormControl,
 } from '@chakra-ui/core';
 import { Formik, Form } from 'formik';
-import { ValuesOfCorrectTypeRule } from 'graphql';
+import { useRouter } from 'next/router';
 import React from 'react';
 import {
   PaginationInput,
   useCreateCommentMutation,
+  useMeQuery,
 } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import SuccessToast from './SuccessToast';
@@ -25,13 +26,17 @@ interface Props {
 
 const CreateComment: React.FC<Props> = ({ postId, setInput, input }) => {
   const toast = useToast();
-
   const [, createComment] = useCreateCommentMutation();
+  const [{ data: meData, fetching }] = useMeQuery();
+  const router = useRouter();
 
   return (
     <Formik
       initialValues={{ text: '', postId }}
       onSubmit={async (values, form) => {
+        if (!meData?.me && !fetching) {
+          router.replace('/login?next=' + `/post/${postId}`);
+        }
         if (input.cursor !== null && values.text.length >= 2)
           setInput({ cursor: null, limit: 4 });
 

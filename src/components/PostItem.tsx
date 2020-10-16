@@ -37,7 +37,7 @@ const PostItem: React.FC<Props> = ({ post, isPostPage }) => {
       <VotingComponent post={post} />
       <Box flex={1}>
         <Flex alignItems="center" minW={0}>
-          <NextLink href={'/post/[id]'} as={`/post/${post.id}`}>
+          <NextLink href={`/post/${post.id}`}>
             <Link color="blue.500" maxW={['275px', '500px', '100%']}>
               <Flex maxW={['400px', '600px']}>
                 <Heading
@@ -94,7 +94,7 @@ const PostItem: React.FC<Props> = ({ post, isPostPage }) => {
           )}
         </Flex>
         <Flex w="100%" mt={2} align="center" justify="space-between">
-          <NextLink href={'/post/[id]'} as={`/post/${post.id}`}>
+          <NextLink href={`/post/${post.id}`}>
             <Link color="blue.500">
               <Box>
                 <Icon name="chat" mr={2} />

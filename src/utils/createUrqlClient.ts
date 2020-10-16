@@ -37,7 +37,12 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
     forward(ops$),
     tap(({ error }) => {
       // If the OperationResult has an error send a request to sentry
-      if (error?.message.includes('Not Authenticated')) {
+
+      if (
+        error?.message.includes('Not Authenticated') &&
+        Router.pathname !== '/post/[id]' &&
+        !Router.pathname.includes('/login')
+      ) {
         Router.replace('/login');
       }
     })
