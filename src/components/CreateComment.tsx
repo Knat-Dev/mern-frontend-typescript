@@ -72,7 +72,7 @@ const CreateComment: React.FC<Props> = ({ postId, setInput, input }) => {
                   isLoading={isSubmitting}
                   variantColor="blue"
                   type="submit"
-                  h="1.75rem"
+                  h="1.65rem"
                   size="sm"
                 >
                   Send Comment

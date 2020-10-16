@@ -22,8 +22,10 @@ import {
   LogoutMutation,
   MeDocument,
   MeQuery,
+  PostDocument,
   PostQuery,
   RegisterMutation,
+  VoteCommentMutationVariables,
   VoteMutationVariables,
 } from '../generated/graphql';
 import { meQueryUpdateAfterLogin } from './meQueryUpdateAfterLogin';
@@ -42,10 +44,22 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
   );
 };
 
+const invalidateEverything = (cache: Cache) => {
+  const allFields = cache.inspectFields('Query');
+  allFields.forEach((fi) => {
+    console.log(fi);
+    if (fi.fieldName === 'posts')
+      cache.invalidate('Query', 'posts', fi.arguments || {});
+    else cache.invalidate('Query', 'post', fi.arguments || {});
+  });
+};
+
 const invalidatePosts = (cache: Cache) => {
   const allFields = cache.inspectFields('Query');
+  console.log(allFields);
   const fieldInfos = allFields.filter((info) => info.fieldName === 'posts');
   fieldInfos.forEach((fi) => {
+    console.log(fi);
     cache.invalidate('Query', 'posts', fi.arguments || {});
   });
 };
@@ -212,12 +226,45 @@ export const createUrqlClient = (
                 );
               }
             },
+            voteComment: (_result, args, cache, info) => {
+              const { commentId, value } = args as VoteCommentMutationVariables;
+              const data = cache.readFragment(
+                gql`
+                  fragment _ on Comment {
+                    id
+                    points
+                    voteStatus
+                  }
+                `,
+                { _id: commentId } as any
+              );
+              console.log(data);
+              if (data) {
+                if (data.voteStatus === value) return;
+                const newPoints =
+                  (data.points as number) + (!data.voteStatus ? 1 : 2) * value;
+                cache.writeFragment(
+                  gql`
+                    fragment _ on Comment {
+                      points
+                      voteStatus
+                    }
+                  `,
+                  {
+                    _id: commentId,
+                    points: newPoints,
+                    voteStatus: value,
+                  } as any
+                );
+              }
+            },
             createPost: (_result, args, cache, info) => {
               console.log(_result, args, info);
               invalidatePosts(cache);
             },
             login: (_result, args, cache, info) => {
-              invalidatePosts(cache);
+              // invalidatePosts(cache);
+              invalidateEverything(cache);
 
               meQueryUpdateAfterLogin<LoginMutation, MeQuery>(
                 cache,
@@ -250,7 +297,7 @@ export const createUrqlClient = (
             },
             logout: (_result, args, cache, info) => {
               invalidatePosts(cache);
-
+              invalidateEverything(cache);
               meQueryUpdateAfterLogin<LogoutMutation, MeQuery>(
                 cache,
                 { query: MeDocument },

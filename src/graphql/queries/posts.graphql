@@ -4,6 +4,7 @@ query Posts($input: PaginationInput!) {
       id
       title
       textSnippet
+      text
       voteStatus
       points
       createdAt

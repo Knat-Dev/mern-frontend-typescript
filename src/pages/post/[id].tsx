@@ -85,7 +85,7 @@ const Post: React.FC<Props> = ({ post }) => {
     <Layout>
       <Box p={['10px', '10px', 0]}>
         <Box mb={8}>
-          <PostItem post={data.post} />
+          <PostItem post={data.post} isPostPage />
         </Box>
         {!data && fetching ? (
           <Box alignSelf="center">

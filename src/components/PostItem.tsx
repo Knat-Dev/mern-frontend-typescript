@@ -21,19 +21,16 @@ import EditDeleteButtons from './EditDeleteButtons';
 
 interface Props {
   post: PostsQuery['posts']['posts'][0];
+  isPostPage?: boolean;
 }
 
-const PostItem: React.FC<Props> = ({ post }) => {
-  const router = useRouter();
-  const [, deletePost] = useDeletePostMutation();
-  const [{ data }] = useMeQuery();
-
+const PostItem: React.FC<Props> = ({ post, isPostPage }) => {
   return (
     <Flex
       key={post.id}
       shadow="md"
       borderWidth="1px"
-      alignItems="center"
+      alignItems={isPostPage ? 'start' : 'center'}
       p={3}
       mb={4}
     >
@@ -42,9 +39,19 @@ const PostItem: React.FC<Props> = ({ post }) => {
         <Flex alignItems="center" minW={0}>
           <NextLink href={'/post/[id]'} as={`/post/${post.id}`}>
             <Link color="blue.500" maxW={['275px', '500px', '100%']}>
-              <Heading fontSize={'xl'} isTruncated>
-                {post.title}
-              </Heading>
+              <Flex maxW={['400px', '600px']}>
+                <Heading
+                  fontSize={'xl'}
+                  isTruncated
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {post.title}
+                </Heading>
+              </Flex>
             </Link>
           </NextLink>
         </Flex>
@@ -62,17 +69,29 @@ const PostItem: React.FC<Props> = ({ post }) => {
         </Box>
 
         <Flex mt={4} justifyContent="space-between" alignItems="center">
-          <Flex maxW={['150px', '450px']}>
+          {!isPostPage ? (
+            <Flex maxW={['150px', '450px']}>
+              <Text
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {post.textSnippet}
+              </Text>
+            </Flex>
+          ) : (
             <Text
+              as="pre"
               style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                wordBreak: 'break-all',
+                whiteSpace: 'pre-wrap',
               }}
             >
-              {post.textSnippet}
+              {post.text};
             </Text>
-          </Flex>
+          )}
         </Flex>
         <Flex w="100%" mt={2} align="center" justify="space-between">
           <NextLink href={'/post/[id]'} as={`/post/${post.id}`}>

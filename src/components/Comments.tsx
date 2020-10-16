@@ -39,9 +39,11 @@ const Comments: React.FC<Props> = ({ comments, postId, setInput, input }) => {
   return (
     <>
       <CreateComment postId={postId} setInput={setInput} input={input} />
-      <Heading size="md" mb={8}>
-        Comments
-      </Heading>
+      {comments.length > 0 && (
+        <Heading fontWeight="medium" size="lg" mb={4}>
+          Comments
+        </Heading>
+      )}
       <List spacing={4}>
         {comments.length > 0 &&
           comments.map((comment) =>

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import {
   PostsQuery,
   RegularCommentFragment,
+  useVoteCommentMutation,
   useVoteMutation,
   VoteMutationVariables,
 } from '../generated/graphql';
@@ -17,23 +18,30 @@ const VotingComponent: React.FC<Props> = ({ post, comment }) => {
     'not-loading' | 'up-loading' | 'down-loading'
   >('not-loading');
   const [, vote] = useVoteMutation();
+  const [, voteComment] = useVoteCommentMutation();
 
   const voteUp = async () => {
     if (post?.voteStatus === 1) return;
+    setButtonsLoading('up-loading');
+
     if (post) {
-      setButtonsLoading('up-loading');
       await vote({ value: 1, postId: post.id });
-      setButtonsLoading('not-loading');
+    } else if (comment) {
+      console.log('upvoting comment...');
+      await voteComment({ value: 1, commentId: comment.id });
     }
+    setButtonsLoading('not-loading');
   };
 
   const voteDown = async () => {
     if (post?.voteStatus === -1) return;
+    setButtonsLoading('down-loading');
     if (post) {
-      setButtonsLoading('down-loading');
       await vote({ value: -1, postId: post.id });
-      setButtonsLoading('not-loading');
+    } else if (comment) {
+      await voteComment({ value: -1, commentId: comment.id });
     }
+    setButtonsLoading('not-loading');
   };
 
   return (
@@ -45,21 +53,33 @@ const VotingComponent: React.FC<Props> = ({ post, comment }) => {
     >
       <IconButton
         icon="chevron-up"
-        size="xs"
+        size={post ? 'sm' : 'xs'}
         aria-label="upvote post"
-        variantColor={post?.voteStatus === 1 ? 'blue' : undefined}
+        variantColor={
+          post?.voteStatus === 1
+            ? 'blue'
+            : comment?.voteStatus === 1
+            ? 'blue'
+            : undefined
+        }
         onClick={voteUp}
         isLoading={buttonsLoading === 'up-loading'}
       />
       <Text display="inline" mx={1}>
         {post && post.points}
-        {/* {comment && comment.points} */}
+        {comment && comment.points}
       </Text>
       <IconButton
         icon="chevron-down"
-        size="xs"
+        size={post ? 'sm' : 'xs'}
         aria-label="downvote post"
-        variantColor={post?.voteStatus === -1 ? 'blue' : undefined}
+        variantColor={
+          post?.voteStatus === -1
+            ? 'blue'
+            : comment?.voteStatus === -1
+            ? 'blue'
+            : undefined
+        }
         onClick={voteDown}
         isLoading={buttonsLoading === 'down-loading'}
       />

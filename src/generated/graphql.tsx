@@ -78,6 +78,8 @@ export type Comment = {
   createdAt: Scalars['Float'];
   updatedAt: Scalars['Float'];
   text: Scalars['String'];
+  points: Scalars['Float'];
+  voteStatus?: Maybe<Scalars['Int']>;
   creator: User;
   post: Post;
 };
@@ -99,6 +101,7 @@ export type Mutation = {
   forgotPassword: Scalars['Boolean'];
   changePassword: UserResponse;
   createComment: CommentResponse;
+  voteComment: Scalars['Boolean'];
 };
 
 
@@ -150,6 +153,12 @@ export type MutationCreateCommentArgs = {
   text: Scalars['String'];
 };
 
+
+export type MutationVoteCommentArgs = {
+  value: Scalars['Int'];
+  commentId: Scalars['String'];
+};
+
 export type PostResponse = {
   __typename?: 'PostResponse';
   errors?: Maybe<Array<FieldError>>;
@@ -197,7 +206,7 @@ export type CommentResponse = {
 
 export type RegularCommentFragment = (
   { __typename?: 'Comment' }
-  & Pick<Comment, 'id' | 'text' | 'createdAt'>
+  & Pick<Comment, 'id' | 'text' | 'createdAt' | 'voteStatus' | 'points'>
   & { creator: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'username'>
@@ -368,6 +377,17 @@ export type VoteMutation = (
   & Pick<Mutation, 'vote'>
 );
 
+export type VoteCommentMutationVariables = Exact<{
+  commentId: Scalars['String'];
+  value: Scalars['Int'];
+}>;
+
+
+export type VoteCommentMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'voteComment'>
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -416,7 +436,7 @@ export type PostsQuery = (
     & Pick<PaginatedPosts, 'hasMore'>
     & { posts: Array<(
       { __typename?: 'Post' }
-      & Pick<Post, 'id' | 'title' | 'textSnippet' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt' | 'commentCount'>
+      & Pick<Post, 'id' | 'title' | 'textSnippet' | 'text' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt' | 'commentCount'>
       & { creator: (
         { __typename?: 'User' }
         & Pick<User, 'id' | 'username'>
@@ -430,6 +450,8 @@ export const RegularCommentFragmentDoc = gql`
   id
   text
   createdAt
+  voteStatus
+  points
   creator {
     id
     username
@@ -593,6 +615,15 @@ export const VoteDocument = gql`
 export function useVoteMutation() {
   return Urql.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument);
 };
+export const VoteCommentDocument = gql`
+    mutation VoteComment($commentId: String!, $value: Int!) {
+  voteComment(commentId: $commentId, value: $value)
+}
+    `;
+
+export function useVoteCommentMutation() {
+  return Urql.useMutation<VoteCommentMutation, VoteCommentMutationVariables>(VoteCommentDocument);
+};
 export const MeDocument = gql`
     query Me {
   me {
@@ -640,6 +671,7 @@ export const PostsDocument = gql`
       id
       title
       textSnippet
+      text
       voteStatus
       points
       createdAt

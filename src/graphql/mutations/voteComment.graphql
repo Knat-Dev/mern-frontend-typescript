@@ -1,0 +1,3 @@
+mutation VoteComment($commentId: String!, $value: Int!) {
+  voteComment(commentId: $commentId, value: $value)
+}
