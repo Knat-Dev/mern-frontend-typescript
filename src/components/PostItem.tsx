@@ -1,4 +1,12 @@
-import { Flex, Box, Heading, Link, Text, IconButton } from '@chakra-ui/core';
+import {
+  Flex,
+  Box,
+  Heading,
+  Link,
+  Text,
+  IconButton,
+  Icon,
+} from '@chakra-ui/core';
 import moment from 'moment';
 import React, { useEffect } from 'react';
 import {
@@ -52,7 +60,6 @@ const PostItem: React.FC<Props> = ({ post }) => {
             {moment(post.createdAt).format('MMM Do, YYYY HH:mm')}
           </Text>
         </Box>
-        <Box></Box>
 
         <Flex mt={4} justifyContent="space-between" alignItems="center">
           <Flex maxW={['150px', '450px']}>
@@ -66,9 +73,21 @@ const PostItem: React.FC<Props> = ({ post }) => {
               {post.textSnippet}
             </Text>
           </Flex>
-          <EditDeleteButtons post={post} />
         </Flex>
-        <Box w="100%" mt={2}></Box>
+        <Flex w="100%" mt={2} align="center" justify="space-between">
+          <NextLink href={'/post/[id]'} as={`/post/${post.id}`}>
+            <Link color="blue.500">
+              <Box>
+                <Icon name="chat" mr={2} />
+                {post.commentCount}{' '}
+                {post.commentCount !== 1 ? 'Comments' : 'Comment'}
+              </Box>
+            </Link>
+          </NextLink>
+          <Box color="gray.500">
+            <EditDeleteButtons post={post} />
+          </Box>
+        </Flex>
       </Box>
     </Flex>
   );

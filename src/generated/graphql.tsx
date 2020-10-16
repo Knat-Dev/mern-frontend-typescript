@@ -46,7 +46,14 @@ export type Post = {
   points: Scalars['Float'];
   voteStatus?: Maybe<Scalars['Int']>;
   creator: User;
+  comments: PaginatedComments;
+  commentCount: Scalars['Float'];
   textSnippet: Scalars['String'];
+};
+
+
+export type PostCommentsArgs = {
+  input: PaginationInput;
 };
 
 export type User = {
@@ -57,6 +64,22 @@ export type User = {
   createdAt: Scalars['Float'];
   posts: Array<Post>;
   updatedAt: Scalars['Float'];
+};
+
+export type PaginatedComments = {
+  __typename?: 'PaginatedComments';
+  comments: Array<Comment>;
+  hasMore: Scalars['Boolean'];
+};
+
+export type Comment = {
+  __typename?: 'Comment';
+  id: Scalars['ID'];
+  createdAt: Scalars['Float'];
+  updatedAt: Scalars['Float'];
+  text: Scalars['String'];
+  creator: User;
+  post: Post;
 };
 
 export type PaginationInput = {
@@ -75,6 +98,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   changePassword: UserResponse;
+  createComment: CommentResponse;
 };
 
 
@@ -120,6 +144,12 @@ export type MutationChangePasswordArgs = {
   input: ChangePasswordInput;
 };
 
+
+export type MutationCreateCommentArgs = {
+  postId: Scalars['String'];
+  text: Scalars['String'];
+};
+
 export type PostResponse = {
   __typename?: 'PostResponse';
   errors?: Maybe<Array<FieldError>>;
@@ -159,6 +189,21 @@ export type ChangePasswordInput = {
   newPassword: Scalars['String'];
 };
 
+export type CommentResponse = {
+  __typename?: 'CommentResponse';
+  errors?: Maybe<Array<FieldError>>;
+  comment?: Maybe<Comment>;
+};
+
+export type RegularCommentFragment = (
+  { __typename?: 'Comment' }
+  & Pick<Comment, 'id' | 'text' | 'createdAt'>
+  & { creator: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username'>
+  ) }
+);
+
 export type RegularErrorFragment = (
   { __typename?: 'FieldError' }
   & Pick<FieldError, 'field' | 'message'>
@@ -195,6 +240,26 @@ export type ChangePasswordMutation = (
   & { changePassword: (
     { __typename?: 'UserResponse' }
     & RegularResponseFragment
+  ) }
+);
+
+export type CreateCommentMutationVariables = Exact<{
+  postId: Scalars['String'];
+  text: Scalars['String'];
+}>;
+
+
+export type CreateCommentMutation = (
+  { __typename?: 'Mutation' }
+  & { createComment: (
+    { __typename?: 'CommentResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>>, comment?: Maybe<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'text'>
+    )> }
   ) }
 );
 
@@ -316,6 +381,7 @@ export type MeQuery = (
 
 export type PostQueryVariables = Exact<{
   id: Scalars['String'];
+  input: PaginationInput;
 }>;
 
 
@@ -323,8 +389,15 @@ export type PostQuery = (
   { __typename?: 'Query' }
   & { post?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'title' | 'text' | 'textSnippet' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt'>
-    & { creator: (
+    & Pick<Post, 'id' | 'title' | 'text' | 'textSnippet' | 'commentCount' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt'>
+    & { comments: (
+      { __typename?: 'PaginatedComments' }
+      & Pick<PaginatedComments, 'hasMore'>
+      & { comments: Array<(
+        { __typename?: 'Comment' }
+        & RegularCommentFragment
+      )> }
+    ), creator: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username'>
     ) }
@@ -343,7 +416,7 @@ export type PostsQuery = (
     & Pick<PaginatedPosts, 'hasMore'>
     & { posts: Array<(
       { __typename?: 'Post' }
-      & Pick<Post, 'id' | 'title' | 'textSnippet' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt'>
+      & Pick<Post, 'id' | 'title' | 'textSnippet' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt' | 'commentCount'>
       & { creator: (
         { __typename?: 'User' }
         & Pick<User, 'id' | 'username'>
@@ -352,6 +425,17 @@ export type PostsQuery = (
   ) }
 );
 
+export const RegularCommentFragmentDoc = gql`
+    fragment RegularComment on Comment {
+  id
+  text
+  createdAt
+  creator {
+    id
+    username
+  }
+}
+    `;
 export const RegularPostFragmentDoc = gql`
     fragment RegularPost on Post {
   id
@@ -398,6 +482,24 @@ export const ChangePasswordDocument = gql`
 
 export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
+export const CreateCommentDocument = gql`
+    mutation CreateComment($postId: String!, $text: String!) {
+  createComment(postId: $postId, text: $text) {
+    errors {
+      field
+      message
+    }
+    comment {
+      id
+      text
+    }
+  }
+}
+    `;
+
+export function useCreateCommentMutation() {
+  return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
 };
 export const CreatePostDocument = gql`
     mutation CreatePost($input: PostInput!) {
@@ -503,23 +605,30 @@ export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'q
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
 export const PostDocument = gql`
-    query Post($id: String!) {
+    query Post($id: String!, $input: PaginationInput!) {
   post(id: $id) {
     id
     title
     text
     textSnippet
+    commentCount
     voteStatus
     points
     createdAt
     updatedAt
+    comments(input: $input) {
+      comments {
+        ...RegularComment
+      }
+      hasMore
+    }
     creator {
       id
       username
     }
   }
 }
-    `;
+    ${RegularCommentFragmentDoc}`;
 
 export function usePostQuery(options: Omit<Urql.UseQueryArgs<PostQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<PostQuery>({ query: PostDocument, ...options });
@@ -539,6 +648,7 @@ export const PostsDocument = gql`
         id
         username
       }
+      commentCount
     }
     hasMore
   }

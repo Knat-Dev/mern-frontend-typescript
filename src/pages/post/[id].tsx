@@ -3,6 +3,8 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
+  Button,
+  CircularProgress,
   Grid,
   Heading,
   Spinner,
@@ -10,10 +12,17 @@ import {
 import moment from 'moment';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Comments from '../../components/Comments';
 import EditDeleteButtons from '../../components/EditDeleteButtons';
 import Layout from '../../components/Layout';
-import { PostsQuery, useMeQuery, usePostQuery } from '../../generated/graphql';
+import PostItem from '../../components/PostItem';
+import {
+  PaginationInput,
+  PostsQuery,
+  useMeQuery,
+  usePostQuery,
+} from '../../generated/graphql';
 import { createUrqlClient } from '../../utils/createUrqlClient';
 
 interface Props {
@@ -23,10 +32,16 @@ interface Props {
 const Post: React.FC<Props> = ({ post }) => {
   const router = useRouter();
   const id = typeof router.query.id === 'string' ? router.query.id : '';
+  const [input, setInput] = useState<PaginationInput>({
+    limit: 4,
+    cursor: null,
+  });
   const [{ data, error, fetching }] = usePostQuery({
     pause: id === '',
+
     variables: {
       id,
+      input,
     },
   });
 
@@ -69,25 +84,41 @@ const Post: React.FC<Props> = ({ post }) => {
   return (
     <Layout>
       <Box p={['10px', '10px', 0]}>
-        <Grid
-          justifyContent="center"
-          alignItems="baseline"
-          justifyItems="center"
-          templateColumns={['repeat(1,1fr)', 'repeat(2,1fr)']}
-          mb={8}
-        >
-          <Heading wordBreak="break-all" fontWeight="medium">
-            {data.post.title}
-          </Heading>
-          <Box color="gray.500">
-            created by {data.post.creator.username} on{' '}
-            {moment(data.post.createdAt).format('MMM Mo, YYYY HH:mm')}
-          </Box>
-        </Grid>
-        <Box minHeight={400} whiteSpace="pre">
-          {data.post.text}
+        <Box mb={8}>
+          <PostItem post={data.post} />
         </Box>
-        <EditDeleteButtons post={data.post} />
+        {!data && fetching ? (
+          <Box alignSelf="center">
+            <CircularProgress isIndeterminate color="blue" />
+          </Box>
+        ) : !data.post ? (
+          <div>error!</div>
+        ) : (
+          <Comments
+            input={input}
+            setInput={setInput}
+            postId={data.post.id}
+            comments={data.post.comments.comments}
+          />
+        )}
+        {data?.post?.comments.hasMore && (
+          <Button
+            w="100%"
+            variantColor="blue"
+            mb={8}
+            onClick={() => {
+              setInput({
+                limit: input.limit,
+                cursor:
+                  data.post?.comments.comments[
+                    data.post.comments.comments.length - 1
+                  ].createdAt,
+              });
+            }}
+          >
+            Load More
+          </Button>
+        )}
       </Box>
     </Layout>
   );

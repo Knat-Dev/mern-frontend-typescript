@@ -1,13 +1,20 @@
-query Post($id: String!) {
+query Post($id: String!, $input: PaginationInput!) {
   post(id: $id) {
     id
     title
     text
     textSnippet
+    commentCount
     voteStatus
     points
     createdAt
     updatedAt
+    comments(input: $input) {
+      comments {
+        ...RegularComment
+      }
+      hasMore
+    }
     creator {
       id
       username

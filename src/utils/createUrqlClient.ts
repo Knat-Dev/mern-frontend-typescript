@@ -15,11 +15,14 @@ import {
 } from 'urql';
 import { pipe, tap } from 'wonka';
 import {
+  CreateCommentMutation,
+  CreateCommentMutationVariables,
   DeletePostMutationVariables,
   LoginMutation,
   LogoutMutation,
   MeDocument,
   MeQuery,
+  PostQuery,
   RegisterMutation,
   VoteMutationVariables,
 } from '../generated/graphql';
@@ -47,6 +50,57 @@ const invalidatePosts = (cache: Cache) => {
   });
 };
 
+const invalidatePost = (cache: Cache, id: string) => {
+  const allFields = cache.inspectFields('Query');
+  const fieldInfos = allFields.filter((info) => info.fieldName === 'post');
+  fieldInfos.forEach((fi) => {
+    cache.invalidate('Query', 'post', { id });
+  });
+};
+
+const cursorPaginationComments = (): Resolver => {
+  return (_parent, fieldArgs, cache, info) => {
+    const { parentKey: entityKey, fieldName } = info;
+    const allFields = cache.inspectFields(entityKey);
+    const fieldInfos = allFields.filter((info) => info.fieldName === fieldName);
+    const size = fieldInfos.length;
+    if (size === 0) {
+      return undefined;
+    }
+
+    const results: DataField[] = [];
+
+    const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`;
+    const isFieldKeyInCache = cache.resolve(
+      cache.resolveFieldByKey(entityKey, fieldKey) as string,
+      'comments'
+    );
+    console.log(isFieldKeyInCache);
+    info.partial = !isFieldKeyInCache;
+
+    let hasMore = true;
+    fieldInfos.forEach((fi) => {
+      const key = cache.resolveFieldByKey(entityKey, fi.fieldKey) as string;
+      const data = cache.resolve(key, 'comments');
+      const _hasMore = cache.resolve(key, 'hasMore');
+      if (!_hasMore) hasMore = _hasMore as boolean;
+      results.push(...data);
+    });
+
+    // console.log(
+    //     'info ',
+    //     'entityKey: ' + entityKey,
+    //     'fieldName: ' + fieldName,
+    //     'fieldInfos: ' + JSON.stringify(fieldInfos)
+    // );
+    return {
+      __typename: 'PaginatedComments',
+      hasMore,
+      comments: results,
+    };
+  };
+};
+
 const cursorPagination = (): Resolver => {
   return (_parent, fieldArgs, cache, info) => {
     const { parentKey: entityKey, fieldName } = info;
@@ -65,8 +119,8 @@ const cursorPagination = (): Resolver => {
       'posts'
     );
     info.partial = !isFieldKeyInCache;
-    let hasMore = true;
 
+    let hasMore = true;
     fieldInfos.forEach((fi) => {
       const key = cache.resolveFieldByKey(entityKey, fi.fieldKey) as string;
       const data = cache.resolve(key, 'posts');
@@ -106,6 +160,15 @@ export const createUrqlClient = (
       dedupExchange,
       cacheExchange({
         resolvers: {
+          Post: {
+            comments: cursorPaginationComments(),
+            // comments: (parent: any, args, cache, info) => {
+            //   console.log(parent.comments);
+            //   console.log(args);
+            //   console.log(info);
+            //   return parent.comments;
+            // },
+          },
           Query: {
             posts: cursorPagination(),
           },
@@ -116,7 +179,11 @@ export const createUrqlClient = (
               const { id } = args as DeletePostMutationVariables;
               cache.invalidate({ __typename: 'Post', id });
             },
-
+            createComment: (_result, args, cache, _info) => {
+              const { postId } = args as CreateCommentMutationVariables;
+              cache.invalidate({ __typename: 'Post', id: postId });
+              // invalidatePost(cache, postId);
+            },
             vote: (_result, args, cache, info) => {
               const { postId, value } = args as VoteMutationVariables;
               const data = cache.readFragment(
@@ -129,6 +196,7 @@ export const createUrqlClient = (
                 `,
                 { _id: postId } as any
               );
+              console.log(data);
               if (data) {
                 if (data.voteStatus === value) return;
                 const newPoints =
@@ -145,6 +213,7 @@ export const createUrqlClient = (
               }
             },
             createPost: (_result, args, cache, info) => {
+              console.log(_result, args, info);
               invalidatePosts(cache);
             },
             login: (_result, args, cache, info) => {

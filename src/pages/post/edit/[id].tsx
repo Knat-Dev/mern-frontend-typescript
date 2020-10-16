@@ -2,7 +2,7 @@ import { Box, Button, Spinner, useToast } from '@chakra-ui/core';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 import InputField from '../../../components/InputField';
 import Layout from '../../../components/Layout';
 import SuccessToast from '../../../components/SuccessToast';
@@ -19,10 +19,16 @@ const EditPost: React.FC<Props> = () => {
   const router = useRouter();
   const id = typeof router.query.id === 'string' ? router.query.id : '';
   const [, updatePost] = useUpdatePostMutation();
+  const [input, setInput] = useState({
+    limit: 4,
+    cursor: null as null | number | undefined,
+  });
+
   const [{ data, error, fetching }] = usePostQuery({
     pause: id === '',
     variables: {
       id,
+      input,
     },
   });
   const toast = useToast();

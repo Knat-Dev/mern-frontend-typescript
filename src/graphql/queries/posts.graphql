@@ -12,6 +12,7 @@ query Posts($input: PaginationInput!) {
         id
         username
       }
+      commentCount
     }
     hasMore
   }
