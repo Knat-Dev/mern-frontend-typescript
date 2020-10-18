@@ -26,26 +26,26 @@ interface Props {
 
 const CreateComment: React.FC<Props> = ({ postId, setInput, input }) => {
   const toast = useToast();
-  const [, createComment] = useCreateCommentMutation();
-  const [{ data: meData, fetching }] = useMeQuery();
+  const [createComment] = useCreateCommentMutation();
+  const { data: meData, loading } = useMeQuery();
   const router = useRouter();
 
   return (
     <Formik
       initialValues={{ text: '', postId }}
       onSubmit={async (values, form) => {
-        if (!meData?.me && !fetching) {
+        if (!meData?.me && !loading) {
           router.replace('/login?next=' + `/post/${postId}`);
         }
         if (input.cursor !== null && values.text.length >= 2)
           setInput({ cursor: null, limit: 4 });
 
-        const { data, error } = await createComment(values);
+        const { data, errors } = await createComment({ variables: values });
         form.resetForm({});
 
         if (data?.createComment.errors) {
           form.setErrors(toErrorMap(data.createComment.errors));
-        } else if (!error) {
+        } else if (!errors) {
           return toast({
             position: 'bottom-left',
             duration: 3000,

@@ -106,14 +106,17 @@ const Index = () => {
               onClick={() => {
                 fetchMore({
                   variables: {
-                    limit: variables?.input.limit,
-                    cursor:
-                      data.posts.posts[data.posts.posts.length - 1].createdAt,
+                    input: {
+                      limit: variables?.input.limit,
+                      cursor:
+                        data.posts.posts[data.posts.posts.length - 1].createdAt,
+                    },
                   },
                   updateQuery: (
                     previousValue: PostsQuery,
                     { fetchMoreResult }
                   ): PostsQuery => {
+                    console.log(fetchMoreResult);
                     if (!fetchMoreResult) return previousValue;
                     return {
                       __typename: 'Query',
@@ -123,7 +126,7 @@ const Index = () => {
                           ...previousValue.posts.posts,
                           ...fetchMoreResult.posts.posts,
                         ],
-                        hasMore: (fetchMoreResult as PostsQuery).posts.hasMore,
+                        hasMore: fetchMoreResult.posts.hasMore,
                       },
                     };
                   },
