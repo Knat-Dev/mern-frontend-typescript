@@ -14,7 +14,9 @@ import {
   stringifyVariables,
 } from 'urql';
 import { pipe, tap } from 'wonka';
+import { devtoolsExchange } from '@urql/devtools';
 import {
+  Comment,
   CreateCommentMutation,
   CreateCommentMutationVariables,
   DeletePostMutationVariables,
@@ -40,7 +42,6 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
 
       if (
         error?.message.includes('Not Authenticated') &&
-        Router.pathname !== '/post/[id]' &&
         !Router.pathname.includes('/login')
       ) {
         Router.replace('/login');
@@ -52,7 +53,6 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
 const invalidateEverything = (cache: Cache) => {
   const allFields = cache.inspectFields('Query');
   allFields.forEach((fi) => {
-    console.log(fi);
     if (fi.fieldName === 'posts')
       cache.invalidate('Query', 'posts', fi.arguments || {});
     else cache.invalidate('Query', 'post', fi.arguments || {});
@@ -61,10 +61,8 @@ const invalidateEverything = (cache: Cache) => {
 
 const invalidatePosts = (cache: Cache) => {
   const allFields = cache.inspectFields('Query');
-  console.log(allFields);
   const fieldInfos = allFields.filter((info) => info.fieldName === 'posts');
   fieldInfos.forEach((fi) => {
-    console.log(fi);
     cache.invalidate('Query', 'posts', fi.arguments || {});
   });
 };
@@ -94,7 +92,6 @@ const cursorPaginationComments = (): Resolver => {
       cache.resolveFieldByKey(entityKey, fieldKey) as string,
       'comments'
     );
-    console.log(isFieldKeyInCache);
     info.partial = !isFieldKeyInCache;
 
     let hasMore = true;
@@ -106,12 +103,6 @@ const cursorPaginationComments = (): Resolver => {
       results.push(...data);
     });
 
-    // console.log(
-    //     'info ',
-    //     'entityKey: ' + entityKey,
-    //     'fieldName: ' + fieldName,
-    //     'fieldInfos: ' + JSON.stringify(fieldInfos)
-    // );
     return {
       __typename: 'PaginatedComments',
       hasMore,
@@ -147,12 +138,7 @@ const cursorPagination = (): Resolver => {
       if (!_hasMore) hasMore = _hasMore as boolean;
       results.push(...data);
     });
-    // console.log(
-    //     'info ',
-    //     'entityKey: ' + entityKey,
-    //     'fieldName: ' + fieldName,
-    //     'fieldInfos: ' + JSON.stringify(fieldInfos)
-    // );
+
     return {
       __typename: 'PaginatedPosts',
       hasMore,
@@ -176,17 +162,12 @@ export const createUrqlClient = (
       headers: cookie ? { cookie } : undefined,
     },
     exchanges: [
+      devtoolsExchange,
       dedupExchange,
       cacheExchange({
         resolvers: {
           Post: {
             comments: cursorPaginationComments(),
-            // comments: (parent: any, args, cache, info) => {
-            //   console.log(parent.comments);
-            //   console.log(args);
-            //   console.log(info);
-            //   return parent.comments;
-            // },
           },
           Query: {
             posts: cursorPagination(),
@@ -199,9 +180,23 @@ export const createUrqlClient = (
               cache.invalidate({ __typename: 'Post', id });
             },
             createComment: (_result, args, cache, _info) => {
+              const { parentKey: entityKey, fieldName } = _info;
+              const allFields = cache.inspectFields(entityKey);
+              const fieldInfos = allFields.filter(
+                (info) => info.fieldName === fieldName
+              );
+              const size = fieldInfos.length;
+              console.log(
+                `entityKey: ${entityKey}, fieldName: ${fieldName}, allFields: ${allFields}, fieldInfos: ${fieldInfos}`
+              );
               const { postId } = args as CreateCommentMutationVariables;
+              console.log(
+                cache.readQuery({
+                  query: PostDocument,
+                  variables: { id: postId },
+                })
+              );
               cache.invalidate({ __typename: 'Post', id: postId });
-              // invalidatePost(cache, postId);
             },
             vote: (_result, args, cache, info) => {
               const { postId, value } = args as VoteMutationVariables;
@@ -215,7 +210,6 @@ export const createUrqlClient = (
                 `,
                 { _id: postId } as any
               );
-              console.log(data);
               if (data) {
                 if (data.voteStatus === value) return;
                 const newPoints =
@@ -243,7 +237,6 @@ export const createUrqlClient = (
                 `,
                 { _id: commentId } as any
               );
-              console.log(data);
               if (data) {
                 if (data.voteStatus === value) return;
                 const newPoints =
@@ -264,7 +257,6 @@ export const createUrqlClient = (
               }
             },
             createPost: (_result, args, cache, info) => {
-              console.log(_result, args, info);
               invalidatePosts(cache);
             },
             login: (_result, args, cache, info) => {

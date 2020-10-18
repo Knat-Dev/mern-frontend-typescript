@@ -1,5 +1,5 @@
-mutation CreateComment($postId: String!, $text: String!) {
-  createComment(postId: $postId, text: $text) {
+mutation CreateComment($postId: String!, $text: String!, $cursor: Float) {
+  createComment(postId: $postId, text: $text, cursor: $cursor) {
     errors {
       field
       message

@@ -124,4 +124,4 @@ const Post: React.FC<Props> = ({ post }) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(Post);
+export default withUrqlClient(createUrqlClient, { ssr: true })(Post);

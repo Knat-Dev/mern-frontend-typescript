@@ -34,8 +34,6 @@ interface Props {
 }
 
 const Comments: React.FC<Props> = ({ comments, postId, setInput, input }) => {
-  console.log(comments);
-
   return (
     <>
       <CreateComment postId={postId} setInput={setInput} input={input} />
