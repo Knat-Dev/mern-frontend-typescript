@@ -18,15 +18,13 @@ import { useMutation } from 'urql';
 import { useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/router';
-import { createUrqlClient } from '../utils/createUrqlClient';
-import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
 import SuccessToast from '../components/SuccessToast';
 interface Props {}
 
 const Register: React.FC<Props> = ({}) => {
   const router = useRouter();
-  const [, register] = useRegisterMutation();
+  const [register] = useRegisterMutation();
   const toast = useToast();
 
   return (
@@ -34,7 +32,7 @@ const Register: React.FC<Props> = ({}) => {
       <Formik
         initialValues={{ username: '', email: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register({ input: values });
+          const response = await register({ variables: { input: values } });
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors));
           } else {
@@ -113,4 +111,4 @@ const Register: React.FC<Props> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(Register);
+export default Register;

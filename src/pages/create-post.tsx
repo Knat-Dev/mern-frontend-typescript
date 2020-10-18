@@ -18,17 +18,17 @@ const CreatePost = () => {
   const toast = useToast();
 
   const router = useRouter();
-  const [, createPost] = useCreatePostMutation();
+  const [createPost] = useCreatePostMutation();
 
   return (
     <Layout variant="small" horizontalCenter>
       <Formik
         initialValues={{ title: '', text: '' }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await createPost({ input: values });
+          const response = await createPost({ variables: { input: values } });
           if (
             !response.data?.createPost?.errors &&
-            !response.error &&
+            !response.errors &&
             response.data?.createPost?.post
           ) {
             await router.push('/');
@@ -85,4 +85,4 @@ const CreatePost = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(CreatePost);
+export default CreatePost;

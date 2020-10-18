@@ -18,14 +18,14 @@ interface Props {}
 const EditPost: React.FC<Props> = () => {
   const router = useRouter();
   const id = typeof router.query.id === 'string' ? router.query.id : '';
-  const [, updatePost] = useUpdatePostMutation();
+  const [updatePost] = useUpdatePostMutation();
   const [input, setInput] = useState({
     limit: 4,
     cursor: null as null | number | undefined,
   });
 
-  const [{ data, error, fetching }] = usePostQuery({
-    pause: id === '',
+  const { data, error, loading } = usePostQuery({
+    skip: id === '',
     variables: {
       id,
       input,
@@ -33,7 +33,7 @@ const EditPost: React.FC<Props> = () => {
   });
   const toast = useToast();
 
-  if (fetching || !data?.post)
+  if (loading || !data?.post)
     return (
       <Layout horizontalCenter>
         <Box textAlign="center">
@@ -55,10 +55,10 @@ const EditPost: React.FC<Props> = () => {
       <Formik
         initialValues={{ id, title: data.post.title, text: data.post.text }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await updatePost(values);
+          const response = await updatePost({ variables: values });
           if (
             !response.data?.updatePost?.errors &&
-            !response.error &&
+            !response.errors &&
             response.data?.updatePost?.post
           ) {
             await router.push('/');
@@ -112,4 +112,4 @@ const EditPost: React.FC<Props> = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(EditPost);
+export default EditPost;

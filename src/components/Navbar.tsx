@@ -5,17 +5,19 @@ import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { isServer } from '../utils/isServer';
 import Wrapper from './Wrapper';
 import SuccessToast from './SuccessToast';
+import { useApolloClient } from '@apollo/client';
 
 interface Props {}
 
 const Navbar: React.FC<Props> = ({}) => {
-  const [{ data, fetching }] = useMeQuery();
-  const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
+  const { data, loading } = useMeQuery();
+  const [logout, { loading: logoutLoading }] = useLogoutMutation();
+  const apolloClient = useApolloClient();
   const toast = useToast();
 
   let body: JSX.Element | null = null;
 
-  if (fetching) body = null;
+  if (loading) body = null;
   else if (!data?.me) {
     body = (
       <>
@@ -36,13 +38,14 @@ const Navbar: React.FC<Props> = ({}) => {
           </Button>
         </NextLink>
         <Button
-          isLoading={logoutFetching}
+          isLoading={logoutLoading}
           variant="link"
           variantColor="#fff"
           mx={[2, 4]}
           onClick={async () => {
-            const { error } = await logout();
-            if (!error) {
+            const { errors } = await logout();
+            if (!errors) {
+              await apolloClient.resetStore();
               return toast({
                 position: 'bottom-left',
                 duration: 3000,

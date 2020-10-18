@@ -26,7 +26,7 @@ import SuccessToast from '../components/SuccessToast';
 interface Props {}
 
 const Login: React.FC<Props> = ({}) => {
-  const [, login] = useLoginMutation();
+  const [login] = useLoginMutation();
   const router = useRouter();
   const toast = useToast();
 
@@ -36,7 +36,7 @@ const Login: React.FC<Props> = ({}) => {
         initialValues={{ usernameOrEmail: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
           const response = await login({
-            input: values,
+            variables: { input: values },
           });
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
@@ -123,4 +123,4 @@ const Login: React.FC<Props> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(Login);
+export default Login;

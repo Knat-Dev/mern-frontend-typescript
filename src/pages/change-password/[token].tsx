@@ -28,14 +28,16 @@ interface Props {}
 const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
   const router = useRouter();
   const [tokenError, setTokenError] = useState('');
-  const [, changePassword] = useChangePasswordMutation();
+  const [changePassword] = useChangePasswordMutation();
 
   return (
     <Wrapper variant="small" horizontalCenter>
       <Formik
         initialValues={{ newPassword: '', token }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await changePassword({ input: values });
+          const response = await changePassword({
+            variables: { input: values },
+          });
           if (response.data?.changePassword.errors) {
             const errorMap = toErrorMap(response.data.changePassword.errors);
             if ('token' in errorMap) {
@@ -93,4 +95,4 @@ ChangePassword.getInitialProps = ({ query }) => {
     token: query.token as string,
   };
 };
-export default withUrqlClient(createUrqlClient)(ChangePassword);
+export default ChangePassword;

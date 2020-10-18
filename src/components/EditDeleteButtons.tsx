@@ -15,8 +15,8 @@ interface Props {
 
 const EditDeleteButtons: React.FC<Props> = ({ post }) => {
   const router = useRouter();
-  const [{ data }] = useMeQuery();
-  const [{ fetching }, deletePost] = useDeletePostMutation();
+  const { data } = useMeQuery();
+  const [deletePost, { loading }] = useDeletePostMutation();
   const toast = useToast();
 
   return data?.me?.id !== post.creator.id ? null : (
@@ -26,9 +26,9 @@ const EditDeleteButtons: React.FC<Props> = ({ post }) => {
         icon="delete"
         aria-label="Delete Post"
         variant="outline"
-        isLoading={fetching}
+        isLoading={loading}
         onClick={async () => {
-          await deletePost({ id: post.id });
+          await deletePost({ variables: { id: post.id } });
           if (router.pathname.includes('/post')) await router.push('/');
           return toast({
             position: 'bottom-left',

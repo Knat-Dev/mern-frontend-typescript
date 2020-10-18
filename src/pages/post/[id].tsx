@@ -36,16 +36,15 @@ const Post: React.FC<Props> = ({ post }) => {
     limit: 4,
     cursor: null,
   });
-  const [{ data, error, fetching }] = usePostQuery({
-    pause: id === '',
-
+  const { data, error, loading } = usePostQuery({
+    skip: id === '',
     variables: {
       id,
       input,
     },
   });
 
-  if (fetching || !data?.post)
+  if (loading || !data?.post)
     return (
       <Layout horizontalCenter>
         <Box textAlign="center">
@@ -87,7 +86,7 @@ const Post: React.FC<Props> = ({ post }) => {
         <Box mb={8}>
           <PostItem post={data.post} isPostPage />
         </Box>
-        {!data && fetching ? (
+        {!data && loading ? (
           <Box alignSelf="center">
             <CircularProgress isIndeterminate color="blue" />
           </Box>
@@ -124,4 +123,4 @@ const Post: React.FC<Props> = ({ post }) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Post);
+export default Post;

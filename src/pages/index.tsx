@@ -19,7 +19,7 @@ import moment from 'moment';
 import { withUrqlClient } from 'next-urql';
 import Layout from '../components/Layout';
 import Navbar from '../components/Navbar';
-import { usePostsQuery } from '../generated/graphql';
+import { PostQuery, PostsQuery, usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import NextLink from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -31,12 +31,14 @@ import Head from 'next/head';
 import Wrapper from '../components/Wrapper';
 
 const Index = () => {
-  const [input, setInput] = useState({
-    limit: 15,
-    cursor: null as number | null,
-  });
-  const [{ data, fetching }] = usePostsQuery({
-    variables: { input },
+  const { data, loading, fetchMore, variables } = usePostsQuery({
+    variables: {
+      input: {
+        limit: 15,
+        cursor: null as number | null,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
   });
 
   let ErrorEl = (
@@ -82,7 +84,7 @@ const Index = () => {
               Create Post
             </Button>
           </NextLink>
-          {!data && fetching ? (
+          {!data && loading ? (
             <Box alignSelf="center">
               <CircularProgress isIndeterminate color="blue" />
             </Box>
@@ -100,11 +102,31 @@ const Index = () => {
               w="100%"
               variantColor="blue"
               mb={8}
+              isLoading={loading}
               onClick={() => {
-                setInput({
-                  limit: input.limit,
-                  cursor:
-                    data.posts.posts[data.posts.posts.length - 1].createdAt,
+                fetchMore({
+                  variables: {
+                    limit: variables?.input.limit,
+                    cursor:
+                      data.posts.posts[data.posts.posts.length - 1].createdAt,
+                  },
+                  updateQuery: (
+                    previousValue: PostsQuery,
+                    { fetchMoreResult }
+                  ): PostsQuery => {
+                    if (!fetchMoreResult) return previousValue;
+                    return {
+                      __typename: 'Query',
+                      posts: {
+                        __typename: 'PaginatedPosts',
+                        posts: [
+                          ...previousValue.posts.posts,
+                          ...fetchMoreResult.posts.posts,
+                        ],
+                        hasMore: (fetchMoreResult as PostsQuery).posts.hasMore,
+                      },
+                    };
+                  },
                 });
               }}
             >
@@ -117,6 +139,4 @@ const Index = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, {
-  ssr: true,
-})(Index);
+export default Index;

@@ -17,18 +17,18 @@ const VotingComponent: React.FC<Props> = ({ post, comment }) => {
   const [buttonsLoading, setButtonsLoading] = useState<
     'not-loading' | 'up-loading' | 'down-loading'
   >('not-loading');
-  const [, vote] = useVoteMutation();
-  const [, voteComment] = useVoteCommentMutation();
+  const [vote] = useVoteMutation();
+  const [voteComment] = useVoteCommentMutation();
 
   const voteUp = async () => {
     if (post?.voteStatus === 1) return;
     setButtonsLoading('up-loading');
 
     if (post) {
-      await vote({ value: 1, postId: post.id });
+      await vote({ variables: { value: 1, postId: post.id } });
     } else if (comment) {
       console.log('upvoting comment...');
-      await voteComment({ value: 1, commentId: comment.id });
+      await voteComment({ variables: { value: 1, commentId: comment.id } });
     }
     setButtonsLoading('not-loading');
   };
@@ -37,9 +37,9 @@ const VotingComponent: React.FC<Props> = ({ post, comment }) => {
     if (post?.voteStatus === -1) return;
     setButtonsLoading('down-loading');
     if (post) {
-      await vote({ value: -1, postId: post.id });
+      await vote({ variables: { value: -1, postId: post.id } });
     } else if (comment) {
-      await voteComment({ value: -1, commentId: comment.id });
+      await voteComment({ variables: { value: -1, commentId: comment.id } });
     }
     setButtonsLoading('not-loading');
   };
