@@ -100,6 +100,7 @@ const Index = () => {
               w="100%"
               variantColor="blue"
               mb={8}
+              isLoading={fetching}
               onClick={() => {
                 setInput({
                   limit: input.limit,

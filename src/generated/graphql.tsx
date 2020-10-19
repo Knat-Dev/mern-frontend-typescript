@@ -149,6 +149,7 @@ export type MutationChangePasswordArgs = {
 
 
 export type MutationCreateCommentArgs = {
+  cursor?: Maybe<Scalars['Float']>;
   postId: Scalars['String'];
   text: Scalars['String'];
 };
