@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Heading, Link, useToast } from '@chakra-ui/core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import NextLink from 'next/link';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { isServer } from '../utils/isServer';
@@ -14,7 +14,9 @@ const Navbar: React.FC<Props> = ({}) => {
   const [logout, { loading: logoutLoading }] = useLogoutMutation();
   const apolloClient = useApolloClient();
   const toast = useToast();
-
+  useEffect(() => {
+    console.log(data?.me);
+  }, [data?.me]);
   let body: JSX.Element | null = null;
 
   if (loading) body = null;
@@ -43,9 +45,13 @@ const Navbar: React.FC<Props> = ({}) => {
           variantColor="#fff"
           mx={[2, 4]}
           onClick={async () => {
-            const { errors } = await logout();
+            const { errors } = await logout({
+              update: (cache) => {
+                cache.evict({ fieldName: 'me' });
+                cache.evict({ fieldName: 'posts:{}' });
+              },
+            });
             if (!errors) {
-              await apolloClient.resetStore();
               return toast({
                 position: 'bottom-left',
                 duration: 3000,

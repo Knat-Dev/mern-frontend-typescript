@@ -11,6 +11,7 @@ import { useCreatePostMutation, useMeQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useIsAuth } from '../utils/useIsAuth';
+import { withApollo } from '../utils/withApollo';
 import forgotPassword from './forgot-password';
 
 const CreatePost = () => {
@@ -25,7 +26,12 @@ const CreatePost = () => {
       <Formik
         initialValues={{ title: '', text: '' }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await createPost({ variables: { input: values } });
+          const response = await createPost({
+            variables: { input: values },
+            update: (cache) => {
+              cache.evict({ fieldName: 'posts' });
+            },
+          });
           if (
             !response.data?.createPost?.errors &&
             !response.errors &&
@@ -85,4 +91,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default withApollo({ ssr: false })(CreatePost);

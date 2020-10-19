@@ -15,11 +15,12 @@ import {
 import Wrapper from '../components/Wrapper';
 import InputField from '../components/InputField';
 import { useMutation } from 'urql';
-import { useRegisterMutation } from '../generated/graphql';
+import { MeDocument, MeQuery, useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import SuccessToast from '../components/SuccessToast';
+import { withApollo } from '../utils/withApollo';
 interface Props {}
 
 const Register: React.FC<Props> = ({}) => {
@@ -32,7 +33,19 @@ const Register: React.FC<Props> = ({}) => {
       <Formik
         initialValues={{ username: '', email: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register({ variables: { input: values } });
+          const response = await register({
+            variables: { input: values },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: 'Query',
+                  me: data?.register.user,
+                },
+              });
+              cache.evict({ fieldName: 'posts:{}' });
+            },
+          });
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors));
           } else {
@@ -111,4 +124,4 @@ const Register: React.FC<Props> = ({}) => {
   );
 };
 
-export default Register;
+export default withApollo({ ssr: false })(Register);

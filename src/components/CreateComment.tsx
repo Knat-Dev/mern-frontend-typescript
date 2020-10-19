@@ -22,9 +22,15 @@ interface Props {
   postId: string;
   setInput: (input: PaginationInput) => void;
   input: PaginationInput;
+  fetchMore: () => void;
 }
 
-const CreateComment: React.FC<Props> = ({ postId, setInput, input }) => {
+const CreateComment: React.FC<Props> = ({
+  postId,
+  setInput,
+  input,
+  fetchMore,
+}) => {
   const toast = useToast();
   const [createComment] = useCreateCommentMutation();
   const { data: meData, loading } = useMeQuery();
@@ -46,6 +52,7 @@ const CreateComment: React.FC<Props> = ({ postId, setInput, input }) => {
         if (data?.createComment.errors) {
           form.setErrors(toErrorMap(data.createComment.errors));
         } else if (!errors) {
+          fetchMore();
           return toast({
             position: 'bottom-left',
             duration: 3000,

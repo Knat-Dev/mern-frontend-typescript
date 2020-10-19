@@ -31,12 +31,24 @@ interface Props {
   comments: RegularCommentFragment[];
   setInput: (input: PaginationInput) => void;
   input: PaginationInput;
+  fetchMore: () => void;
 }
 
-const Comments: React.FC<Props> = ({ comments, postId, setInput, input }) => {
+const Comments: React.FC<Props> = ({
+  comments,
+  postId,
+  setInput,
+  input,
+  fetchMore,
+}) => {
   return (
     <>
-      <CreateComment postId={postId} setInput={setInput} input={input} />
+      <CreateComment
+        postId={postId}
+        setInput={setInput}
+        input={input}
+        fetchMore={fetchMore}
+      />
       {comments.length > 0 && (
         <Heading fontWeight="medium" size="lg" mb={4}>
           Comments

@@ -9,11 +9,7 @@ import {
 } from '@chakra-ui/core';
 import moment from 'moment';
 import React, { useEffect } from 'react';
-import {
-  PostsQuery,
-  useDeletePostMutation,
-  useMeQuery,
-} from '../generated/graphql';
+import { PostsQuery } from '../generated/graphql';
 import VotingComponent from './VotingComponent';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';

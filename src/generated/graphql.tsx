@@ -1,9 +1,7 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -21,9 +19,11 @@ export type Query = {
   me?: Maybe<User>;
 };
 
+
 export type QueryPostsArgs = {
   input: PaginationInput;
 };
+
 
 export type QueryPostArgs = {
   id: Scalars['String'];
@@ -49,6 +49,7 @@ export type Post = {
   commentCount: Scalars['Float'];
   textSnippet: Scalars['String'];
 };
+
 
 export type PostCommentsArgs = {
   input: PaginationInput;
@@ -102,9 +103,11 @@ export type Mutation = {
   voteComment: Scalars['Boolean'];
 };
 
+
 export type MutationCreatePostArgs = {
   input: PostInput;
 };
+
 
 export type MutationUpdatePostArgs = {
   text: Scalars['String'];
@@ -112,36 +115,44 @@ export type MutationUpdatePostArgs = {
   id: Scalars['String'];
 };
 
+
 export type MutationDeletePostArgs = {
   id: Scalars['String'];
 };
+
 
 export type MutationVoteArgs = {
   value: Scalars['Int'];
   postId: Scalars['String'];
 };
 
+
 export type MutationRegisterArgs = {
   input: RegisterInput;
 };
+
 
 export type MutationLoginArgs = {
   input: LoginInput;
 };
 
+
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
 };
 
+
 export type MutationChangePasswordArgs = {
   input: ChangePasswordInput;
 };
+
 
 export type MutationCreateCommentArgs = {
   cursor?: Maybe<Scalars['Float']>;
   postId: Scalars['String'];
   text: Scalars['String'];
 };
+
 
 export type MutationVoteCommentArgs = {
   value: Scalars['Int'];
@@ -193,38 +204,53 @@ export type CommentResponse = {
   comment?: Maybe<Comment>;
 };
 
-export type RegularCommentFragment = { __typename?: 'Comment' } & Pick<
-  Comment,
-  'id' | 'text' | 'createdAt' | 'voteStatus' | 'points'
-> & { creator: { __typename?: 'User' } & Pick<User, 'id' | 'username'> };
+export type RegularCommentFragment = (
+  { __typename?: 'Comment' }
+  & Pick<Comment, 'id' | 'text' | 'createdAt' | 'voteStatus' | 'points'>
+  & { creator: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username'>
+  ) }
+);
 
-export type RegularErrorFragment = { __typename?: 'FieldError' } & Pick<
-  FieldError,
-  'field' | 'message'
->;
+export type RegularErrorFragment = (
+  { __typename?: 'FieldError' }
+  & Pick<FieldError, 'field' | 'message'>
+);
 
-export type RegularPostFragment = { __typename?: 'Post' } & Pick<
-  Post,
-  'id' | 'title' | 'text' | 'points' | 'createdAt' | 'updatedAt'
->;
+export type RegularPostFragment = (
+  { __typename?: 'Post' }
+  & Pick<Post, 'id' | 'title' | 'text' | 'points' | 'createdAt' | 'updatedAt'>
+);
 
-export type RegularResponseFragment = { __typename?: 'UserResponse' } & {
-  errors?: Maybe<Array<{ __typename?: 'FieldError' } & RegularErrorFragment>>;
-  user?: Maybe<{ __typename?: 'User' } & RegularUserFragment>;
-};
+export type RegularResponseFragment = (
+  { __typename?: 'UserResponse' }
+  & { errors?: Maybe<Array<(
+    { __typename?: 'FieldError' }
+    & RegularErrorFragment
+  )>>, user?: Maybe<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
 
-export type RegularUserFragment = { __typename?: 'User' } & Pick<
-  User,
-  'id' | 'email' | 'username' | 'createdAt' | 'updatedAt'
->;
+export type RegularUserFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'id' | 'email' | 'username' | 'createdAt' | 'updatedAt'>
+);
 
 export type ChangePasswordMutationVariables = Exact<{
   input: ChangePasswordInput;
 }>;
 
-export type ChangePasswordMutation = { __typename?: 'Mutation' } & {
-  changePassword: { __typename?: 'UserResponse' } & RegularResponseFragment;
-};
+
+export type ChangePasswordMutation = (
+  { __typename?: 'Mutation' }
+  & { changePassword: (
+    { __typename?: 'UserResponse' }
+    & RegularResponseFragment
+  ) }
+);
 
 export type CreateCommentMutationVariables = Exact<{
   postId: Scalars['String'];
@@ -232,72 +258,93 @@ export type CreateCommentMutationVariables = Exact<{
   cursor?: Maybe<Scalars['Float']>;
 }>;
 
-export type CreateCommentMutation = { __typename?: 'Mutation' } & {
-  createComment: { __typename?: 'CommentResponse' } & {
-    errors?: Maybe<
-      Array<
-        { __typename?: 'FieldError' } & Pick<FieldError, 'field' | 'message'>
-      >
-    >;
-    comment?: Maybe<{ __typename?: 'Comment' } & Pick<Comment, 'id' | 'text'>>;
-  };
-};
+
+export type CreateCommentMutation = (
+  { __typename?: 'Mutation' }
+  & { createComment: (
+    { __typename?: 'CommentResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>>, comment?: Maybe<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'text'>
+    )> }
+  ) }
+);
 
 export type CreatePostMutationVariables = Exact<{
   input: PostInput;
 }>;
 
-export type CreatePostMutation = { __typename?: 'Mutation' } & {
-  createPost?: Maybe<
-    { __typename?: 'PostResponse' } & {
-      errors?: Maybe<
-        Array<{ __typename?: 'FieldError' } & RegularErrorFragment>
-      >;
-      post?: Maybe<{ __typename?: 'Post' } & RegularPostFragment>;
-    }
-  >;
-};
+
+export type CreatePostMutation = (
+  { __typename?: 'Mutation' }
+  & { createPost?: Maybe<(
+    { __typename?: 'PostResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & RegularErrorFragment
+    )>>, post?: Maybe<(
+      { __typename?: 'Post' }
+      & RegularPostFragment
+    )> }
+  )> }
+);
 
 export type DeletePostMutationVariables = Exact<{
   id: Scalars['String'];
 }>;
 
-export type DeletePostMutation = { __typename?: 'Mutation' } & Pick<
-  Mutation,
-  'deletePost'
->;
+
+export type DeletePostMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deletePost'>
+);
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
 }>;
 
-export type ForgotPasswordMutation = { __typename?: 'Mutation' } & Pick<
-  Mutation,
-  'forgotPassword'
->;
+
+export type ForgotPasswordMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'forgotPassword'>
+);
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
-export type LoginMutation = { __typename?: 'Mutation' } & {
-  login: { __typename?: 'UserResponse' } & RegularResponseFragment;
-};
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+export type LoginMutation = (
+  { __typename?: 'Mutation' }
+  & { login: (
+    { __typename?: 'UserResponse' }
+    & RegularResponseFragment
+  ) }
+);
 
-export type LogoutMutation = { __typename?: 'Mutation' } & Pick<
-  Mutation,
-  'logout'
->;
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'logout'>
+);
 
 export type RegisterMutationVariables = Exact<{
   input: RegisterInput;
 }>;
 
-export type RegisterMutation = { __typename?: 'Mutation' } & {
-  register: { __typename?: 'UserResponse' } & RegularResponseFragment;
-};
+
+export type RegisterMutation = (
+  { __typename?: 'Mutation' }
+  & { register: (
+    { __typename?: 'UserResponse' }
+    & RegularResponseFragment
+  ) }
+);
 
 export type UpdatePostMutationVariables = Exact<{
   id: Scalars['String'];
@@ -305,153 +352,157 @@ export type UpdatePostMutationVariables = Exact<{
   text: Scalars['String'];
 }>;
 
-export type UpdatePostMutation = { __typename?: 'Mutation' } & {
-  updatePost: { __typename?: 'PostResponse' } & {
-    errors?: Maybe<Array<{ __typename?: 'FieldError' } & RegularErrorFragment>>;
-    post?: Maybe<{ __typename?: 'Post' } & RegularPostFragment>;
-  };
-};
+
+export type UpdatePostMutation = (
+  { __typename?: 'Mutation' }
+  & { updatePost: (
+    { __typename?: 'PostResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & RegularErrorFragment
+    )>>, post?: Maybe<(
+      { __typename?: 'Post' }
+      & RegularPostFragment
+    )> }
+  ) }
+);
 
 export type VoteMutationVariables = Exact<{
   postId: Scalars['String'];
   value: Scalars['Int'];
 }>;
 
-export type VoteMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'vote'>;
+
+export type VoteMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'vote'>
+);
 
 export type VoteCommentMutationVariables = Exact<{
   commentId: Scalars['String'];
   value: Scalars['Int'];
 }>;
 
-export type VoteCommentMutation = { __typename?: 'Mutation' } & Pick<
-  Mutation,
-  'voteComment'
->;
 
-export type MeQueryVariables = Exact<{ [key: string]: never }>;
+export type VoteCommentMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'voteComment'>
+);
 
-export type MeQuery = { __typename?: 'Query' } & {
-  me?: Maybe<{ __typename?: 'User' } & RegularUserFragment>;
-};
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = (
+  { __typename?: 'Query' }
+  & { me?: Maybe<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
 
 export type PostQueryVariables = Exact<{
   id: Scalars['String'];
   input: PaginationInput;
 }>;
 
-export type PostQuery = { __typename?: 'Query' } & {
-  post?: Maybe<
-    { __typename?: 'Post' } & Pick<
-      Post,
-      | 'id'
-      | 'title'
-      | 'text'
-      | 'textSnippet'
-      | 'commentCount'
-      | 'voteStatus'
-      | 'points'
-      | 'createdAt'
-      | 'updatedAt'
-    > & {
-        comments: { __typename?: 'PaginatedComments' } & Pick<
-          PaginatedComments,
-          'hasMore'
-        > & {
-            comments: Array<
-              { __typename?: 'Comment' } & RegularCommentFragment
-            >;
-          };
-        creator: { __typename?: 'User' } & Pick<User, 'id' | 'username'>;
-      }
-  >;
-};
+
+export type PostQuery = (
+  { __typename?: 'Query' }
+  & { post?: Maybe<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'title' | 'text' | 'textSnippet' | 'commentCount' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt'>
+    & { comments: (
+      { __typename?: 'PaginatedComments' }
+      & Pick<PaginatedComments, 'hasMore'>
+      & { comments: Array<(
+        { __typename?: 'Comment' }
+        & RegularCommentFragment
+      )> }
+    ), creator: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    ) }
+  )> }
+);
 
 export type PostsQueryVariables = Exact<{
   input: PaginationInput;
 }>;
 
-export type PostsQuery = { __typename?: 'Query' } & {
-  posts: { __typename?: 'PaginatedPosts' } & Pick<PaginatedPosts, 'hasMore'> & {
-      posts: Array<
-        { __typename?: 'Post' } & Pick<
-          Post,
-          | 'id'
-          | 'title'
-          | 'textSnippet'
-          | 'text'
-          | 'voteStatus'
-          | 'points'
-          | 'createdAt'
-          | 'updatedAt'
-          | 'commentCount'
-        > & { creator: { __typename?: 'User' } & Pick<User, 'id' | 'username'> }
-      >;
-    };
-};
+
+export type PostsQuery = (
+  { __typename?: 'Query' }
+  & { posts: (
+    { __typename?: 'PaginatedPosts' }
+    & Pick<PaginatedPosts, 'hasMore'>
+    & { posts: Array<(
+      { __typename?: 'Post' }
+      & Pick<Post, 'id' | 'title' | 'textSnippet' | 'text' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt' | 'commentCount'>
+      & { creator: (
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'username'>
+      ) }
+    )> }
+  ) }
+);
 
 export const RegularCommentFragmentDoc = gql`
-  fragment RegularComment on Comment {
+    fragment RegularComment on Comment {
+  id
+  text
+  createdAt
+  voteStatus
+  points
+  creator {
     id
-    text
-    createdAt
-    voteStatus
-    points
-    creator {
-      id
-      username
-    }
-  }
-`;
-export const RegularPostFragmentDoc = gql`
-  fragment RegularPost on Post {
-    id
-    title
-    text
-    points
-    createdAt
-    updatedAt
-  }
-`;
-export const RegularErrorFragmentDoc = gql`
-  fragment RegularError on FieldError {
-    field
-    message
-  }
-`;
-export const RegularUserFragmentDoc = gql`
-  fragment RegularUser on User {
-    id
-    email
     username
-    createdAt
-    updatedAt
   }
-`;
+}
+    `;
+export const RegularPostFragmentDoc = gql`
+    fragment RegularPost on Post {
+  id
+  title
+  text
+  points
+  createdAt
+  updatedAt
+}
+    `;
+export const RegularErrorFragmentDoc = gql`
+    fragment RegularError on FieldError {
+  field
+  message
+}
+    `;
+export const RegularUserFragmentDoc = gql`
+    fragment RegularUser on User {
+  id
+  email
+  username
+  createdAt
+  updatedAt
+}
+    `;
 export const RegularResponseFragmentDoc = gql`
-  fragment RegularResponse on UserResponse {
-    errors {
-      ...RegularError
-    }
-    user {
-      ...RegularUser
-    }
+    fragment RegularResponse on UserResponse {
+  errors {
+    ...RegularError
   }
-  ${RegularErrorFragmentDoc}
-  ${RegularUserFragmentDoc}
-`;
+  user {
+    ...RegularUser
+  }
+}
+    ${RegularErrorFragmentDoc}
+${RegularUserFragmentDoc}`;
 export const ChangePasswordDocument = gql`
-  mutation ChangePassword($input: ChangePasswordInput!) {
-    changePassword(input: $input) {
-      ...RegularResponse
-    }
+    mutation ChangePassword($input: ChangePasswordInput!) {
+  changePassword(input: $input) {
+    ...RegularResponse
   }
-  ${RegularResponseFragmentDoc}
-`;
-export type ChangePasswordMutationFn = Apollo.MutationFunction<
-  ChangePasswordMutation,
-  ChangePasswordMutationVariables
->;
+}
+    ${RegularResponseFragmentDoc}`;
+export type ChangePasswordMutationFn = Apollo.MutationFunction<ChangePasswordMutation, ChangePasswordMutationVariables>;
 
 /**
  * __useChangePasswordMutation__
@@ -470,45 +521,27 @@ export type ChangePasswordMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useChangePasswordMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    ChangePasswordMutation,
-    ChangePasswordMutationVariables
-  >
-) {
-  return Apollo.useMutation<
-    ChangePasswordMutation,
-    ChangePasswordMutationVariables
-  >(ChangePasswordDocument, baseOptions);
-}
-export type ChangePasswordMutationHookResult = ReturnType<
-  typeof useChangePasswordMutation
->;
-export type ChangePasswordMutationResult = Apollo.MutationResult<
-  ChangePasswordMutation
->;
-export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<
-  ChangePasswordMutation,
-  ChangePasswordMutationVariables
->;
+export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
+        return Apollo.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, baseOptions);
+      }
+export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
+export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
+export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
 export const CreateCommentDocument = gql`
-  mutation CreateComment($postId: String!, $text: String!, $cursor: Float) {
-    createComment(postId: $postId, text: $text, cursor: $cursor) {
-      errors {
-        field
-        message
-      }
-      comment {
-        id
-        text
-      }
+    mutation CreateComment($postId: String!, $text: String!, $cursor: Float) {
+  createComment(postId: $postId, text: $text, cursor: $cursor) {
+    errors {
+      field
+      message
+    }
+    comment {
+      id
+      text
     }
   }
-`;
-export type CreateCommentMutationFn = Apollo.MutationFunction<
-  CreateCommentMutation,
-  CreateCommentMutationVariables
->;
+}
+    `;
+export type CreateCommentMutationFn = Apollo.MutationFunction<CreateCommentMutation, CreateCommentMutationVariables>;
 
 /**
  * __useCreateCommentMutation__
@@ -529,45 +562,26 @@ export type CreateCommentMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateCommentMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateCommentMutation,
-    CreateCommentMutationVariables
-  >
-) {
-  return Apollo.useMutation<
-    CreateCommentMutation,
-    CreateCommentMutationVariables
-  >(CreateCommentDocument, baseOptions);
-}
-export type CreateCommentMutationHookResult = ReturnType<
-  typeof useCreateCommentMutation
->;
-export type CreateCommentMutationResult = Apollo.MutationResult<
-  CreateCommentMutation
->;
-export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<
-  CreateCommentMutation,
-  CreateCommentMutationVariables
->;
+export function useCreateCommentMutation(baseOptions?: Apollo.MutationHookOptions<CreateCommentMutation, CreateCommentMutationVariables>) {
+        return Apollo.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument, baseOptions);
+      }
+export type CreateCommentMutationHookResult = ReturnType<typeof useCreateCommentMutation>;
+export type CreateCommentMutationResult = Apollo.MutationResult<CreateCommentMutation>;
+export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<CreateCommentMutation, CreateCommentMutationVariables>;
 export const CreatePostDocument = gql`
-  mutation CreatePost($input: PostInput!) {
-    createPost(input: $input) {
-      errors {
-        ...RegularError
-      }
-      post {
-        ...RegularPost
-      }
+    mutation CreatePost($input: PostInput!) {
+  createPost(input: $input) {
+    errors {
+      ...RegularError
+    }
+    post {
+      ...RegularPost
     }
   }
-  ${RegularErrorFragmentDoc}
-  ${RegularPostFragmentDoc}
-`;
-export type CreatePostMutationFn = Apollo.MutationFunction<
-  CreatePostMutation,
-  CreatePostMutationVariables
->;
+}
+    ${RegularErrorFragmentDoc}
+${RegularPostFragmentDoc}`;
+export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;
 
 /**
  * __useCreatePostMutation__
@@ -586,36 +600,18 @@ export type CreatePostMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreatePostMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreatePostMutation,
-    CreatePostMutationVariables
-  >
-) {
-  return Apollo.useMutation<CreatePostMutation, CreatePostMutationVariables>(
-    CreatePostDocument,
-    baseOptions
-  );
-}
-export type CreatePostMutationHookResult = ReturnType<
-  typeof useCreatePostMutation
->;
-export type CreatePostMutationResult = Apollo.MutationResult<
-  CreatePostMutation
->;
-export type CreatePostMutationOptions = Apollo.BaseMutationOptions<
-  CreatePostMutation,
-  CreatePostMutationVariables
->;
+export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<CreatePostMutation, CreatePostMutationVariables>) {
+        return Apollo.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument, baseOptions);
+      }
+export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
+export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
+export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
 export const DeletePostDocument = gql`
-  mutation DeletePost($id: String!) {
-    deletePost(id: $id)
-  }
-`;
-export type DeletePostMutationFn = Apollo.MutationFunction<
-  DeletePostMutation,
-  DeletePostMutationVariables
->;
+    mutation DeletePost($id: String!) {
+  deletePost(id: $id)
+}
+    `;
+export type DeletePostMutationFn = Apollo.MutationFunction<DeletePostMutation, DeletePostMutationVariables>;
 
 /**
  * __useDeletePostMutation__
@@ -634,36 +630,18 @@ export type DeletePostMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useDeletePostMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    DeletePostMutation,
-    DeletePostMutationVariables
-  >
-) {
-  return Apollo.useMutation<DeletePostMutation, DeletePostMutationVariables>(
-    DeletePostDocument,
-    baseOptions
-  );
-}
-export type DeletePostMutationHookResult = ReturnType<
-  typeof useDeletePostMutation
->;
-export type DeletePostMutationResult = Apollo.MutationResult<
-  DeletePostMutation
->;
-export type DeletePostMutationOptions = Apollo.BaseMutationOptions<
-  DeletePostMutation,
-  DeletePostMutationVariables
->;
+export function useDeletePostMutation(baseOptions?: Apollo.MutationHookOptions<DeletePostMutation, DeletePostMutationVariables>) {
+        return Apollo.useMutation<DeletePostMutation, DeletePostMutationVariables>(DeletePostDocument, baseOptions);
+      }
+export type DeletePostMutationHookResult = ReturnType<typeof useDeletePostMutation>;
+export type DeletePostMutationResult = Apollo.MutationResult<DeletePostMutation>;
+export type DeletePostMutationOptions = Apollo.BaseMutationOptions<DeletePostMutation, DeletePostMutationVariables>;
 export const ForgotPasswordDocument = gql`
-  mutation ForgotPassword($email: String!) {
-    forgotPassword(email: $email)
-  }
-`;
-export type ForgotPasswordMutationFn = Apollo.MutationFunction<
-  ForgotPasswordMutation,
-  ForgotPasswordMutationVariables
->;
+    mutation ForgotPassword($email: String!) {
+  forgotPassword(email: $email)
+}
+    `;
+export type ForgotPasswordMutationFn = Apollo.MutationFunction<ForgotPasswordMutation, ForgotPasswordMutationVariables>;
 
 /**
  * __useForgotPasswordMutation__
@@ -682,39 +660,20 @@ export type ForgotPasswordMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useForgotPasswordMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    ForgotPasswordMutation,
-    ForgotPasswordMutationVariables
-  >
-) {
-  return Apollo.useMutation<
-    ForgotPasswordMutation,
-    ForgotPasswordMutationVariables
-  >(ForgotPasswordDocument, baseOptions);
-}
-export type ForgotPasswordMutationHookResult = ReturnType<
-  typeof useForgotPasswordMutation
->;
-export type ForgotPasswordMutationResult = Apollo.MutationResult<
-  ForgotPasswordMutation
->;
-export type ForgotPasswordMutationOptions = Apollo.BaseMutationOptions<
-  ForgotPasswordMutation,
-  ForgotPasswordMutationVariables
->;
+export function useForgotPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ForgotPasswordMutation, ForgotPasswordMutationVariables>) {
+        return Apollo.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument, baseOptions);
+      }
+export type ForgotPasswordMutationHookResult = ReturnType<typeof useForgotPasswordMutation>;
+export type ForgotPasswordMutationResult = Apollo.MutationResult<ForgotPasswordMutation>;
+export type ForgotPasswordMutationOptions = Apollo.BaseMutationOptions<ForgotPasswordMutation, ForgotPasswordMutationVariables>;
 export const LoginDocument = gql`
-  mutation Login($input: LoginInput!) {
-    login(input: $input) {
-      ...RegularResponse
-    }
+    mutation Login($input: LoginInput!) {
+  login(input: $input) {
+    ...RegularResponse
   }
-  ${RegularResponseFragmentDoc}
-`;
-export type LoginMutationFn = Apollo.MutationFunction<
-  LoginMutation,
-  LoginMutationVariables
->;
+}
+    ${RegularResponseFragmentDoc}`;
+export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
  * __useLoginMutation__
@@ -733,32 +692,18 @@ export type LoginMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLoginMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    LoginMutation,
-    LoginMutationVariables
-  >
-) {
-  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
-    LoginDocument,
-    baseOptions
-  );
-}
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
+      }
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<
-  LoginMutation,
-  LoginMutationVariables
->;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const LogoutDocument = gql`
-  mutation Logout {
-    logout
-  }
-`;
-export type LogoutMutationFn = Apollo.MutationFunction<
-  LogoutMutation,
-  LogoutMutationVariables
->;
+    mutation Logout {
+  logout
+}
+    `;
+export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
 
 /**
  * __useLogoutMutation__
@@ -776,35 +721,20 @@ export type LogoutMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLogoutMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    LogoutMutation,
-    LogoutMutationVariables
-  >
-) {
-  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
-    LogoutDocument,
-    baseOptions
-  );
-}
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, baseOptions);
+      }
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<
-  LogoutMutation,
-  LogoutMutationVariables
->;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = gql`
-  mutation Register($input: RegisterInput!) {
-    register(input: $input) {
-      ...RegularResponse
-    }
+    mutation Register($input: RegisterInput!) {
+  register(input: $input) {
+    ...RegularResponse
   }
-  ${RegularResponseFragmentDoc}
-`;
-export type RegisterMutationFn = Apollo.MutationFunction<
-  RegisterMutation,
-  RegisterMutationVariables
->;
+}
+    ${RegularResponseFragmentDoc}`;
+export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
  * __useRegisterMutation__
@@ -823,41 +753,26 @@ export type RegisterMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useRegisterMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RegisterMutation,
-    RegisterMutationVariables
-  >
-) {
-  return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(
-    RegisterDocument,
-    baseOptions
-  );
-}
+export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
+        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, baseOptions);
+      }
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
-export type RegisterMutationOptions = Apollo.BaseMutationOptions<
-  RegisterMutation,
-  RegisterMutationVariables
->;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const UpdatePostDocument = gql`
-  mutation UpdatePost($id: String!, $title: String!, $text: String!) {
-    updatePost(id: $id, title: $title, text: $text) {
-      errors {
-        ...RegularError
-      }
-      post {
-        ...RegularPost
-      }
+    mutation UpdatePost($id: String!, $title: String!, $text: String!) {
+  updatePost(id: $id, title: $title, text: $text) {
+    errors {
+      ...RegularError
+    }
+    post {
+      ...RegularPost
     }
   }
-  ${RegularErrorFragmentDoc}
-  ${RegularPostFragmentDoc}
-`;
-export type UpdatePostMutationFn = Apollo.MutationFunction<
-  UpdatePostMutation,
-  UpdatePostMutationVariables
->;
+}
+    ${RegularErrorFragmentDoc}
+${RegularPostFragmentDoc}`;
+export type UpdatePostMutationFn = Apollo.MutationFunction<UpdatePostMutation, UpdatePostMutationVariables>;
 
 /**
  * __useUpdatePostMutation__
@@ -878,36 +793,18 @@ export type UpdatePostMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdatePostMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdatePostMutation,
-    UpdatePostMutationVariables
-  >
-) {
-  return Apollo.useMutation<UpdatePostMutation, UpdatePostMutationVariables>(
-    UpdatePostDocument,
-    baseOptions
-  );
-}
-export type UpdatePostMutationHookResult = ReturnType<
-  typeof useUpdatePostMutation
->;
-export type UpdatePostMutationResult = Apollo.MutationResult<
-  UpdatePostMutation
->;
-export type UpdatePostMutationOptions = Apollo.BaseMutationOptions<
-  UpdatePostMutation,
-  UpdatePostMutationVariables
->;
+export function useUpdatePostMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePostMutation, UpdatePostMutationVariables>) {
+        return Apollo.useMutation<UpdatePostMutation, UpdatePostMutationVariables>(UpdatePostDocument, baseOptions);
+      }
+export type UpdatePostMutationHookResult = ReturnType<typeof useUpdatePostMutation>;
+export type UpdatePostMutationResult = Apollo.MutationResult<UpdatePostMutation>;
+export type UpdatePostMutationOptions = Apollo.BaseMutationOptions<UpdatePostMutation, UpdatePostMutationVariables>;
 export const VoteDocument = gql`
-  mutation Vote($postId: String!, $value: Int!) {
-    vote(postId: $postId, value: $value)
-  }
-`;
-export type VoteMutationFn = Apollo.MutationFunction<
-  VoteMutation,
-  VoteMutationVariables
->;
+    mutation Vote($postId: String!, $value: Int!) {
+  vote(postId: $postId, value: $value)
+}
+    `;
+export type VoteMutationFn = Apollo.MutationFunction<VoteMutation, VoteMutationVariables>;
 
 /**
  * __useVoteMutation__
@@ -927,29 +824,18 @@ export type VoteMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useVoteMutation(
-  baseOptions?: Apollo.MutationHookOptions<VoteMutation, VoteMutationVariables>
-) {
-  return Apollo.useMutation<VoteMutation, VoteMutationVariables>(
-    VoteDocument,
-    baseOptions
-  );
-}
+export function useVoteMutation(baseOptions?: Apollo.MutationHookOptions<VoteMutation, VoteMutationVariables>) {
+        return Apollo.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument, baseOptions);
+      }
 export type VoteMutationHookResult = ReturnType<typeof useVoteMutation>;
 export type VoteMutationResult = Apollo.MutationResult<VoteMutation>;
-export type VoteMutationOptions = Apollo.BaseMutationOptions<
-  VoteMutation,
-  VoteMutationVariables
->;
+export type VoteMutationOptions = Apollo.BaseMutationOptions<VoteMutation, VoteMutationVariables>;
 export const VoteCommentDocument = gql`
-  mutation VoteComment($commentId: String!, $value: Int!) {
-    voteComment(commentId: $commentId, value: $value)
-  }
-`;
-export type VoteCommentMutationFn = Apollo.MutationFunction<
-  VoteCommentMutation,
-  VoteCommentMutationVariables
->;
+    mutation VoteComment($commentId: String!, $value: Int!) {
+  voteComment(commentId: $commentId, value: $value)
+}
+    `;
+export type VoteCommentMutationFn = Apollo.MutationFunction<VoteCommentMutation, VoteCommentMutationVariables>;
 
 /**
  * __useVoteCommentMutation__
@@ -969,35 +855,19 @@ export type VoteCommentMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useVoteCommentMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    VoteCommentMutation,
-    VoteCommentMutationVariables
-  >
-) {
-  return Apollo.useMutation<VoteCommentMutation, VoteCommentMutationVariables>(
-    VoteCommentDocument,
-    baseOptions
-  );
-}
-export type VoteCommentMutationHookResult = ReturnType<
-  typeof useVoteCommentMutation
->;
-export type VoteCommentMutationResult = Apollo.MutationResult<
-  VoteCommentMutation
->;
-export type VoteCommentMutationOptions = Apollo.BaseMutationOptions<
-  VoteCommentMutation,
-  VoteCommentMutationVariables
->;
+export function useVoteCommentMutation(baseOptions?: Apollo.MutationHookOptions<VoteCommentMutation, VoteCommentMutationVariables>) {
+        return Apollo.useMutation<VoteCommentMutation, VoteCommentMutationVariables>(VoteCommentDocument, baseOptions);
+      }
+export type VoteCommentMutationHookResult = ReturnType<typeof useVoteCommentMutation>;
+export type VoteCommentMutationResult = Apollo.MutationResult<VoteCommentMutation>;
+export type VoteCommentMutationOptions = Apollo.BaseMutationOptions<VoteCommentMutation, VoteCommentMutationVariables>;
 export const MeDocument = gql`
-  query Me {
-    me {
-      ...RegularUser
-    }
+    query Me {
+  me {
+    ...RegularUser
   }
-  ${RegularUserFragmentDoc}
-`;
+}
+    ${RegularUserFragmentDoc}`;
 
 /**
  * __useMeQuery__
@@ -1014,48 +884,40 @@ export const MeDocument = gql`
  *   },
  * });
  */
-export function useMeQuery(
-  baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>
-) {
-  return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
-}
-export function useMeLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>
-) {
-  return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(
-    MeDocument,
-    baseOptions
-  );
-}
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+      }
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+        }
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const PostDocument = gql`
-  query Post($id: String!, $input: PaginationInput!) {
-    post(id: $id) {
+    query Post($id: String!, $input: PaginationInput!) {
+  post(id: $id) {
+    id
+    title
+    text
+    textSnippet
+    commentCount
+    voteStatus
+    points
+    createdAt
+    updatedAt
+    comments(input: $input) @connection(key: "input") {
+      comments {
+        ...RegularComment
+      }
+      hasMore
+    }
+    creator {
       id
-      title
-      text
-      textSnippet
-      commentCount
-      voteStatus
-      points
-      createdAt
-      updatedAt
-      comments(input: $input) {
-        comments {
-          ...RegularComment
-        }
-        hasMore
-      }
-      creator {
-        id
-        username
-      }
+      username
     }
   }
-  ${RegularCommentFragmentDoc}
-`;
+}
+    ${RegularCommentFragmentDoc}`;
 
 /**
  * __usePostQuery__
@@ -1074,47 +936,37 @@ export const PostDocument = gql`
  *   },
  * });
  */
-export function usePostQuery(
-  baseOptions?: Apollo.QueryHookOptions<PostQuery, PostQueryVariables>
-) {
-  return Apollo.useQuery<PostQuery, PostQueryVariables>(
-    PostDocument,
-    baseOptions
-  );
-}
-export function usePostLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<PostQuery, PostQueryVariables>
-) {
-  return Apollo.useLazyQuery<PostQuery, PostQueryVariables>(
-    PostDocument,
-    baseOptions
-  );
-}
+export function usePostQuery(baseOptions?: Apollo.QueryHookOptions<PostQuery, PostQueryVariables>) {
+        return Apollo.useQuery<PostQuery, PostQueryVariables>(PostDocument, baseOptions);
+      }
+export function usePostLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostQuery, PostQueryVariables>) {
+          return Apollo.useLazyQuery<PostQuery, PostQueryVariables>(PostDocument, baseOptions);
+        }
 export type PostQueryHookResult = ReturnType<typeof usePostQuery>;
 export type PostLazyQueryHookResult = ReturnType<typeof usePostLazyQuery>;
 export type PostQueryResult = Apollo.QueryResult<PostQuery, PostQueryVariables>;
 export const PostsDocument = gql`
-  query Posts($input: PaginationInput!) {
-    posts(input: $input) {
-      posts {
+    query Posts($input: PaginationInput!) {
+  posts(input: $input) {
+    posts {
+      id
+      title
+      textSnippet
+      text
+      voteStatus
+      points
+      createdAt
+      updatedAt
+      creator {
         id
-        title
-        textSnippet
-        text
-        voteStatus
-        points
-        createdAt
-        updatedAt
-        creator {
-          id
-          username
-        }
-        commentCount
+        username
       }
-      hasMore
+      commentCount
     }
+    hasMore
   }
-`;
+}
+    `;
 
 /**
  * __usePostsQuery__
@@ -1132,25 +984,12 @@ export const PostsDocument = gql`
  *   },
  * });
  */
-export function usePostsQuery(
-  baseOptions?: Apollo.QueryHookOptions<PostsQuery, PostsQueryVariables>
-) {
-  return Apollo.useQuery<PostsQuery, PostsQueryVariables>(
-    PostsDocument,
-    baseOptions
-  );
-}
-export function usePostsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<PostsQuery, PostsQueryVariables>
-) {
-  return Apollo.useLazyQuery<PostsQuery, PostsQueryVariables>(
-    PostsDocument,
-    baseOptions
-  );
-}
+export function usePostsQuery(baseOptions?: Apollo.QueryHookOptions<PostsQuery, PostsQueryVariables>) {
+        return Apollo.useQuery<PostsQuery, PostsQueryVariables>(PostsDocument, baseOptions);
+      }
+export function usePostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostsQuery, PostsQueryVariables>) {
+          return Apollo.useLazyQuery<PostsQuery, PostsQueryVariables>(PostsDocument, baseOptions);
+        }
 export type PostsQueryHookResult = ReturnType<typeof usePostsQuery>;
 export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
-export type PostsQueryResult = Apollo.QueryResult<
-  PostsQuery,
-  PostsQueryVariables
->;
+export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;

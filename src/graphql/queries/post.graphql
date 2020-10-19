@@ -9,7 +9,7 @@ query Post($id: String!, $input: PaginationInput!) {
     points
     createdAt
     updatedAt
-    comments(input: $input) {
+    comments(input: $input) @connection(key: "input") {
       comments {
         ...RegularComment
       }

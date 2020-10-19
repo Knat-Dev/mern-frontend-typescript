@@ -28,7 +28,12 @@ const EditDeleteButtons: React.FC<Props> = ({ post }) => {
         variant="outline"
         isLoading={loading}
         onClick={async () => {
-          await deletePost({ variables: { id: post.id } });
+          await deletePost({
+            variables: { id: post.id },
+            update: (cache) => {
+              cache.evict({ id: 'Post:' + post.id });
+            },
+          });
           if (router.pathname.includes('/post')) await router.push('/');
           return toast({
             position: 'bottom-left',

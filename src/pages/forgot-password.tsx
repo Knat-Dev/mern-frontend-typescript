@@ -20,6 +20,7 @@ import login from './login';
 import NextLink from 'next/link';
 import { useForgotPasswordMutation } from '../generated/graphql';
 import { Router } from 'next/router';
+import { withApollo } from '../utils/withApollo';
 
 interface Props {}
 
@@ -90,4 +91,4 @@ const ForgotPassword: React.FC<Props> = (props) => {
   );
 };
 
-export default ForgotPassword;
+export default withApollo({ ssr: false })(ForgotPassword);

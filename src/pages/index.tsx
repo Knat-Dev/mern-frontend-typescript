@@ -29,6 +29,7 @@ import VotingComponent from '../components/VotingComponent';
 import PostItem from '../components/PostItem';
 import Head from 'next/head';
 import Wrapper from '../components/Wrapper';
+import { withApollo } from '../utils/withApollo';
 
 const Index = () => {
   const { data, loading, fetchMore, variables } = usePostsQuery({
@@ -112,24 +113,24 @@ const Index = () => {
                         data.posts.posts[data.posts.posts.length - 1].createdAt,
                     },
                   },
-                  updateQuery: (
-                    previousValue: PostsQuery,
-                    { fetchMoreResult }
-                  ): PostsQuery => {
-                    console.log(fetchMoreResult);
-                    if (!fetchMoreResult) return previousValue;
-                    return {
-                      __typename: 'Query',
-                      posts: {
-                        __typename: 'PaginatedPosts',
-                        posts: [
-                          ...previousValue.posts.posts,
-                          ...fetchMoreResult.posts.posts,
-                        ],
-                        hasMore: fetchMoreResult.posts.hasMore,
-                      },
-                    };
-                  },
+                  // updateQuery: (
+                  //   previousValue: PostsQuery,
+                  //   { fetchMoreResult }
+                  // ): PostsQuery => {
+                  //   console.log(fetchMoreResult);
+                  //   if (!fetchMoreResult) return previousValue;
+                  //   return {
+                  //     __typename: 'Query',
+                  //     posts: {
+                  //       __typename: 'PaginatedPosts',
+                  //       posts: [
+                  //         ...previousValue.posts.posts,
+                  //         ...fetchMoreResult.posts.posts,
+                  //       ],
+                  //       hasMore: fetchMoreResult.posts.hasMore,
+                  //     },
+                  //   };
+                  // },
                 });
               }}
             >
@@ -142,4 +143,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default withApollo({ ssr: true })(Index);

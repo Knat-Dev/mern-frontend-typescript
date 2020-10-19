@@ -24,6 +24,7 @@ import {
   usePostQuery,
 } from '../../generated/graphql';
 import { createUrqlClient } from '../../utils/createUrqlClient';
+import { withApollo } from '../../utils/withApollo';
 
 interface Props {
   post: PostsQuery['posts']['posts'][0];
@@ -36,13 +37,28 @@ const Post: React.FC<Props> = ({ post }) => {
     limit: 4,
     cursor: null,
   });
-  const { data, error, loading } = usePostQuery({
+  const { data, error, loading, variables, fetchMore } = usePostQuery({
     skip: id === '',
+    notifyOnNetworkStatusChange: false,
     variables: {
       id,
       input,
     },
   });
+
+  const fetchMoreComments = async () => {
+    await fetchMore({
+      variables: {
+        input: {
+          limit: variables?.input.limit,
+          cursor:
+            data?.post?.comments.comments[
+              data?.post?.comments.comments.length - 1
+            ].createdAt,
+        },
+      },
+    });
+  };
 
   if (loading || !data?.post)
     return (
@@ -94,6 +110,7 @@ const Post: React.FC<Props> = ({ post }) => {
           <div>error!</div>
         ) : (
           <Comments
+            fetchMore={fetchMoreComments}
             input={input}
             setInput={setInput}
             postId={data.post.id}
@@ -123,4 +140,4 @@ const Post: React.FC<Props> = ({ post }) => {
   );
 };
 
-export default Post;
+export default withApollo({ ssr: true })(Post);

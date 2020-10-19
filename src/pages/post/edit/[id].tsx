@@ -10,6 +10,7 @@ import {
   useUpdatePostMutation,
 } from '../../../generated/graphql';
 import { toErrorMap } from '../../../utils/toErrorMap';
+import { withApollo } from '../../../utils/withApollo';
 
 interface Props {}
 
@@ -110,4 +111,4 @@ const EditPost: React.FC<Props> = () => {
   );
 };
 
-export default EditPost;
+export default withApollo({ ssr: true })(EditPost);
