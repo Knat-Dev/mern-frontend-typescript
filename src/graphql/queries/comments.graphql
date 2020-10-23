@@ -1,0 +1,8 @@
+query Comments($postId: String!, $input: PaginationInput!) {
+  comments(postId: $postId, input: $input) @connection(key: "Comments") {
+    comments {
+      ...RegularComment
+    }
+    hasMore
+  }
+}

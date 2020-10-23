@@ -29,26 +29,13 @@ import VotingComponent from './VotingComponent';
 interface Props {
   postId: string;
   comments: RegularCommentFragment[];
-  setInput: (input: PaginationInput) => void;
-  input: PaginationInput;
   fetchMore: () => void;
 }
 
-const Comments: React.FC<Props> = ({
-  comments,
-  postId,
-  setInput,
-  input,
-  fetchMore,
-}) => {
+const Comments: React.FC<Props> = ({ comments, postId, fetchMore }) => {
   return (
     <>
-      <CreateComment
-        postId={postId}
-        setInput={setInput}
-        input={input}
-        fetchMore={fetchMore}
-      />
+      <CreateComment postId={postId} fetchMore={fetchMore} />
       {comments.length > 0 && (
         <Heading fontWeight="medium" size="lg" mb={4}>
           Comments

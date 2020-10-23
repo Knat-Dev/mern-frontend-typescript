@@ -85,7 +85,7 @@ const PostItem: React.FC<Props> = ({ post, isPostPage }) => {
                 whiteSpace: 'pre-wrap',
               }}
             >
-              {post.text};
+              {post.text}
             </Text>
           )}
         </Flex>

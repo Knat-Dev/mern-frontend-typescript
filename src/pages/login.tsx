@@ -39,6 +39,7 @@ const Login: React.FC<Props> = ({}) => {
           const response = await login({
             variables: { input: values },
             update: (cache, { data }) => {
+              cache.reset();
               cache.writeQuery<MeQuery>({
                 query: MeDocument,
                 data: {
@@ -46,15 +47,16 @@ const Login: React.FC<Props> = ({}) => {
                   me: data?.login.user,
                 },
               });
-              cache.evict({ fieldName: 'posts:{}' });
+              // cache.evict({ fieldName: 'posts:{}' });
+              // cache.evict({ fieldName: 'comments:', args: { postId: {} } });
             },
           });
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
           } else {
             if (typeof router.query.next === 'string')
-              router.push(router.query.next);
-            else router.push('/');
+              router.replace(router.query.next);
+            else router.replace('/');
             return toast({
               position: 'bottom-left',
               duration: 3000,

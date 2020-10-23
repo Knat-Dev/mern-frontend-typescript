@@ -17,6 +17,7 @@ export type Query = {
   posts: PaginatedPosts;
   post?: Maybe<Post>;
   me?: Maybe<User>;
+  comments: PaginatedComments;
 };
 
 
@@ -27,6 +28,12 @@ export type QueryPostsArgs = {
 
 export type QueryPostArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryCommentsArgs = {
+  input: PaginationInput;
+  postId: Scalars['String'];
 };
 
 export type PaginatedPosts = {
@@ -268,7 +275,7 @@ export type CreateCommentMutation = (
       & Pick<FieldError, 'field' | 'message'>
     )>>, comment?: Maybe<(
       { __typename?: 'Comment' }
-      & Pick<Comment, 'id' | 'text'>
+      & RegularCommentFragment
     )> }
   ) }
 );
@@ -389,6 +396,24 @@ export type VoteCommentMutation = (
   & Pick<Mutation, 'voteComment'>
 );
 
+export type CommentsQueryVariables = Exact<{
+  postId: Scalars['String'];
+  input: PaginationInput;
+}>;
+
+
+export type CommentsQuery = (
+  { __typename?: 'Query' }
+  & { comments: (
+    { __typename?: 'PaginatedComments' }
+    & Pick<PaginatedComments, 'hasMore'>
+    & { comments: Array<(
+      { __typename?: 'Comment' }
+      & RegularCommentFragment
+    )> }
+  ) }
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -402,7 +427,6 @@ export type MeQuery = (
 
 export type PostQueryVariables = Exact<{
   id: Scalars['String'];
-  input: PaginationInput;
 }>;
 
 
@@ -411,14 +435,7 @@ export type PostQuery = (
   & { post?: Maybe<(
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'title' | 'text' | 'textSnippet' | 'commentCount' | 'voteStatus' | 'points' | 'createdAt' | 'updatedAt'>
-    & { comments: (
-      { __typename?: 'PaginatedComments' }
-      & Pick<PaginatedComments, 'hasMore'>
-      & { comments: Array<(
-        { __typename?: 'Comment' }
-        & RegularCommentFragment
-      )> }
-    ), creator: (
+    & { creator: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username'>
     ) }
@@ -535,12 +552,11 @@ export const CreateCommentDocument = gql`
       message
     }
     comment {
-      id
-      text
+      ...RegularComment
     }
   }
 }
-    `;
+    ${RegularCommentFragmentDoc}`;
 export type CreateCommentMutationFn = Apollo.MutationFunction<CreateCommentMutation, CreateCommentMutationVariables>;
 
 /**
@@ -861,6 +877,43 @@ export function useVoteCommentMutation(baseOptions?: Apollo.MutationHookOptions<
 export type VoteCommentMutationHookResult = ReturnType<typeof useVoteCommentMutation>;
 export type VoteCommentMutationResult = Apollo.MutationResult<VoteCommentMutation>;
 export type VoteCommentMutationOptions = Apollo.BaseMutationOptions<VoteCommentMutation, VoteCommentMutationVariables>;
+export const CommentsDocument = gql`
+    query Comments($postId: String!, $input: PaginationInput!) {
+  comments(postId: $postId, input: $input) @connection(key: "Comments") {
+    comments {
+      ...RegularComment
+    }
+    hasMore
+  }
+}
+    ${RegularCommentFragmentDoc}`;
+
+/**
+ * __useCommentsQuery__
+ *
+ * To run a query within a React component, call `useCommentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommentsQuery({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCommentsQuery(baseOptions?: Apollo.QueryHookOptions<CommentsQuery, CommentsQueryVariables>) {
+        return Apollo.useQuery<CommentsQuery, CommentsQueryVariables>(CommentsDocument, baseOptions);
+      }
+export function useCommentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CommentsQuery, CommentsQueryVariables>) {
+          return Apollo.useLazyQuery<CommentsQuery, CommentsQueryVariables>(CommentsDocument, baseOptions);
+        }
+export type CommentsQueryHookResult = ReturnType<typeof useCommentsQuery>;
+export type CommentsLazyQueryHookResult = ReturnType<typeof useCommentsLazyQuery>;
+export type CommentsQueryResult = Apollo.QueryResult<CommentsQuery, CommentsQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -894,7 +947,7 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const PostDocument = gql`
-    query Post($id: String!, $input: PaginationInput!) {
+    query Post($id: String!) {
   post(id: $id) {
     id
     title
@@ -905,19 +958,13 @@ export const PostDocument = gql`
     points
     createdAt
     updatedAt
-    comments(input: $input) @connection(key: "input") {
-      comments {
-        ...RegularComment
-      }
-      hasMore
-    }
     creator {
       id
       username
     }
   }
 }
-    ${RegularCommentFragmentDoc}`;
+    `;
 
 /**
  * __usePostQuery__
@@ -932,7 +979,6 @@ export const PostDocument = gql`
  * const { data, loading, error } = usePostQuery({
  *   variables: {
  *      id: // value for 'id'
- *      input: // value for 'input'
  *   },
  * });
  */

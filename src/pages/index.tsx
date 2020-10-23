@@ -33,13 +33,13 @@ import { withApollo } from '../utils/withApollo';
 
 const Index = () => {
   const { data, loading, fetchMore, variables } = usePostsQuery({
+    notifyOnNetworkStatusChange: false,
     variables: {
       input: {
         limit: 15,
         cursor: null as number | null,
       },
     },
-    notifyOnNetworkStatusChange: true,
   });
 
   let ErrorEl = (

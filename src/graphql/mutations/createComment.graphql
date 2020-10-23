@@ -5,8 +5,7 @@ mutation CreateComment($postId: String!, $text: String!, $cursor: Float) {
       message
     }
     comment {
-      id
-      text
+      ...RegularComment
     }
   }
 }

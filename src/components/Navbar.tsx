@@ -12,7 +12,6 @@ interface Props {}
 const Navbar: React.FC<Props> = ({}) => {
   const { data, loading } = useMeQuery();
   const [logout, { loading: logoutLoading }] = useLogoutMutation();
-  const apolloClient = useApolloClient();
   const toast = useToast();
   useEffect(() => {
     console.log(data?.me);
@@ -48,7 +47,8 @@ const Navbar: React.FC<Props> = ({}) => {
             const { errors } = await logout({
               update: (cache) => {
                 cache.evict({ fieldName: 'me' });
-                cache.evict({ fieldName: 'posts:{}' });
+                // cache.evict({ fieldName: 'posts:{}' });
+                cache.reset();
               },
             });
             if (!errors) {

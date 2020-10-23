@@ -6,8 +6,10 @@ import {
   PostQuery,
   PostsQuery,
   RegularCommentFragment,
+  useMeQuery,
   useVoteCommentMutation,
   useVoteMutation,
+  VoteCommentMutation,
   VoteMutation,
   VoteMutationVariables,
 } from '../generated/graphql';
@@ -21,12 +23,12 @@ const VotingComponent: React.FC<Props> = ({ post, comment }) => {
   const [buttonsLoading, setButtonsLoading] = useState<
     'not-loading' | 'up-loading' | 'down-loading'
   >('not-loading');
-  const [vote] = useVoteMutation();
-  const [voteComment] = useVoteCommentMutation();
+  const [vote] = useVoteMutation({ onError: () => {} });
+  const [voteComment] = useVoteCommentMutation({ onError: () => {} });
 
   const voteUpdate = (
     type: 'post' | 'comment',
-    cache: ApolloCache<VoteMutation>,
+    cache: ApolloCache<VoteMutation | VoteCommentMutation>,
     id: string,
     value: number
   ) => {
@@ -84,7 +86,10 @@ const VotingComponent: React.FC<Props> = ({ post, comment }) => {
       });
     } else if (comment) {
       console.log('upvoting comment...');
-      await voteComment({ variables: { value: 1, commentId: comment.id } });
+      await voteComment({
+        variables: { value: 1, commentId: comment.id },
+        update: (cache) => voteUpdate('comment', cache, comment.id, 1),
+      });
     }
     setButtonsLoading('not-loading');
   };
@@ -98,7 +103,10 @@ const VotingComponent: React.FC<Props> = ({ post, comment }) => {
         update: (cache) => voteUpdate('post', cache, post.id, -1),
       });
     } else if (comment) {
-      await voteComment({ variables: { value: -1, commentId: comment.id } });
+      await voteComment({
+        variables: { value: -1, commentId: comment.id },
+        update: (cache) => voteUpdate('comment', cache, comment.id, -1),
+      });
     }
     setButtonsLoading('not-loading');
   };

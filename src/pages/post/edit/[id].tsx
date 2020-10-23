@@ -1,3 +1,4 @@
+import { useApolloClient } from '@apollo/client';
 import { Box, Button, Spinner, useToast } from '@chakra-ui/core';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
@@ -16,6 +17,7 @@ interface Props {}
 
 const EditPost: React.FC<Props> = () => {
   const router = useRouter();
+  const client = useApolloClient();
   const id = typeof router.query.id === 'string' ? router.query.id : '';
   const [updatePost] = useUpdatePostMutation();
   const [input, setInput] = useState({
@@ -27,7 +29,6 @@ const EditPost: React.FC<Props> = () => {
     skip: id === '',
     variables: {
       id,
-      input,
     },
   });
   const toast = useToast();
@@ -60,6 +61,7 @@ const EditPost: React.FC<Props> = () => {
             !response.errors &&
             response.data?.updatePost?.post
           ) {
+            console.log(client.cache.evict({ id: 'Post:' + id }));
             await router.push('/');
             return toast({
               position: 'bottom-left',

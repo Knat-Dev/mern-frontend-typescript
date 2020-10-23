@@ -1,29 +1,14 @@
-import {
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  CircularProgress,
-  Grid,
-  Heading,
-  Spinner,
-} from '@chakra-ui/core';
-import moment from 'moment';
-import { withUrqlClient } from 'next-urql';
+import { Box, Button, CircularProgress, Spinner } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Comments from '../../components/Comments';
-import EditDeleteButtons from '../../components/EditDeleteButtons';
 import Layout from '../../components/Layout';
 import PostItem from '../../components/PostItem';
 import {
-  PaginationInput,
   PostsQuery,
-  useMeQuery,
+  useCommentsQuery,
   usePostQuery,
 } from '../../generated/graphql';
-import { createUrqlClient } from '../../utils/createUrqlClient';
 import { withApollo } from '../../utils/withApollo';
 
 interface Props {
@@ -33,34 +18,45 @@ interface Props {
 const Post: React.FC<Props> = ({ post }) => {
   const router = useRouter();
   const id = typeof router.query.id === 'string' ? router.query.id : '';
-  const [input, setInput] = useState<PaginationInput>({
-    limit: 4,
-    cursor: null,
-  });
-  const { data, error, loading, variables, fetchMore } = usePostQuery({
+  // const [input, setInput] = useState<PaginationInput>({
+  //   limit: 4,
+  //   cursor: null,
+  // });
+
+  const { data, error, loading } = usePostQuery({
     skip: id === '',
-    notifyOnNetworkStatusChange: false,
     variables: {
       id,
-      input,
     },
   });
+  const {
+    data: commentsData,
+    loading: commentsLoading,
+    fetchMore,
+    variables,
+  } = useCommentsQuery({
+    skip: id === '',
+    variables: { postId: id, input: { limit: 4, cursor: null } },
+  });
+
+  useEffect(() => {
+    console.log(commentsData);
+  }, [commentsData]);
 
   const fetchMoreComments = async () => {
     await fetchMore({
       variables: {
         input: {
           limit: variables?.input.limit,
-          cursor:
-            data?.post?.comments.comments[
-              data?.post?.comments.comments.length - 1
-            ].createdAt,
+          cursor: commentsData!.comments.comments[
+            commentsData!.comments.comments.length - 1
+          ].createdAt,
         },
       },
     });
   };
 
-  if (loading || !data?.post)
+  if (!data?.post || loading)
     return (
       <Layout horizontalCenter>
         <Box textAlign="center">
@@ -72,27 +68,6 @@ const Post: React.FC<Props> = ({ post }) => {
             size="xl"
           />
         </Box>
-      </Layout>
-    );
-
-  if (error?.message) return <div>{error.message}</div>;
-
-  if (!data?.post)
-    return (
-      <Layout>
-        <Alert
-          status="error"
-          variant="subtle"
-          flexDirection="column"
-          justifyContent="center"
-          textAlign="center"
-          height="150px"
-        >
-          <AlertIcon size="40px" mr={0} />
-          <AlertTitle mt={4} mb={1} fontSize="lg">
-            Post could not be found!
-          </AlertTitle>
-        </Alert>
       </Layout>
     );
 
@@ -109,26 +84,31 @@ const Post: React.FC<Props> = ({ post }) => {
         ) : !data.post ? (
           <div>error!</div>
         ) : (
-          <Comments
-            fetchMore={fetchMoreComments}
-            input={input}
-            setInput={setInput}
-            postId={data.post.id}
-            comments={data.post.comments.comments}
-          />
+          commentsData && (
+            <Comments
+              fetchMore={fetchMoreComments}
+              postId={data.post.id}
+              comments={commentsData!.comments.comments}
+            />
+          )
         )}
-        {data?.post?.comments.hasMore && (
+        {commentsData?.comments.hasMore && (
           <Button
             w="100%"
             variantColor="blue"
             mb={8}
+            isLoading={commentsLoading}
             onClick={() => {
-              setInput({
-                limit: input.limit,
-                cursor:
-                  data.post?.comments.comments[
-                    data.post.comments.comments.length - 1
-                  ].createdAt,
+              fetchMore({
+                variables: {
+                  input: {
+                    limit: variables?.input.limit,
+                    cursor:
+                      commentsData.comments.comments[
+                        commentsData.comments.comments.length - 1
+                      ].createdAt,
+                  },
+                },
               });
             }}
           >
@@ -140,4 +120,4 @@ const Post: React.FC<Props> = ({ post }) => {
   );
 };
 
-export default withApollo({ ssr: true })(Post);
+export default withApollo({ ssr: false })(Post);

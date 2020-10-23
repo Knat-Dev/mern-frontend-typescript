@@ -1,4 +1,4 @@
-query Post($id: String!, $input: PaginationInput!) {
+query Post($id: String!) {
   post(id: $id) {
     id
     title
@@ -9,12 +9,6 @@ query Post($id: String!, $input: PaginationInput!) {
     points
     createdAt
     updatedAt
-    comments(input: $input) @connection(key: "input") {
-      comments {
-        ...RegularComment
-      }
-      hasMore
-    }
     creator {
       id
       username

@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client';
 import {
   InputGroup,
   Input,
@@ -11,7 +12,10 @@ import { Formik, Form } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
 import {
+  CommentsDocument,
+  CreateCommentDocument,
   PaginationInput,
+  RegularCommentFragmentDoc,
   useCreateCommentMutation,
   useMeQuery,
 } from '../generated/graphql';
@@ -20,19 +24,12 @@ import SuccessToast from './SuccessToast';
 
 interface Props {
   postId: string;
-  setInput: (input: PaginationInput) => void;
-  input: PaginationInput;
   fetchMore: () => void;
 }
 
-const CreateComment: React.FC<Props> = ({
-  postId,
-  setInput,
-  input,
-  fetchMore,
-}) => {
+const CreateComment: React.FC<Props> = ({ postId, fetchMore }) => {
   const toast = useToast();
-  const [createComment] = useCreateCommentMutation();
+  const [createComment] = useCreateCommentMutation({});
   const { data: meData, loading } = useMeQuery();
   const router = useRouter();
 
@@ -43,16 +40,83 @@ const CreateComment: React.FC<Props> = ({
         if (!meData?.me && !loading) {
           router.replace('/login?next=' + `/post/${postId}`);
         }
-        if (input.cursor !== null && values.text.length >= 2)
-          setInput({ cursor: null, limit: 4 });
 
-        const { data, errors } = await createComment({ variables: values });
+        const { data, errors } = await createComment({
+          variables: values,
+          update: (cache, { data }) => {
+            cache.modify({
+              fields: {
+                comments(existingComments = []) {
+                  console.log(existingComments);
+                  console.log(data);
+                  const addedComment = data?.createComment.comment;
+                  console.log(addedComment);
+                  const doc = cache.writeFragment({
+                    fragment: RegularCommentFragmentDoc,
+                    data: addedComment,
+                  });
+                  console.log({
+                    ...existingComments,
+                    comments: [doc, ...existingComments.comments],
+                  });
+                  return {
+                    ...existingComments,
+                    comments: [doc, ...existingComments.comments],
+                  };
+                },
+                post(existingComments = []) {
+                  console.log(existingComments, data);
+                  // return { ...existingComments };
+                },
+              },
+            });
+          },
+          //   console.log(data);
+          //   cache.modify({
+          //     fields: {
+          //       comments(existingComments = []) {
+          //         console.log(existingComments);
+          //         const newCommentRef = cache.writeFragment({
+          //           data: data?.createComment.comment,
+          //           fragment: gql`
+          //             fragment NewComment on Comment {
+          //               id
+          //             }
+          //           `,
+          //         });
+          //         // cache.evict({ fieldName: 'Post:' + postId });
+          //         console.log('hi', [
+          //           newCommentRef,
+          //           ...existingComments.comments,
+          //         ]);
+
+          //         form.resetForm({});
+          //         toast({
+          //           position: 'bottom-left',
+          //           duration: 3000,
+          //           render: ({ onClose }) => (
+          //             <SuccessToast
+          //               onClose={onClose}
+          //               description="You've successfully commented on a post"
+          //             />
+          //           ),
+          //         });
+          //         return {
+          //           __typeName: 'PaginatedComments',
+          //           comments: [newCommentRef],
+          //           hasMore: false,
+          //         };
+          //       },
+          //     },
+          //   });
+          // },
+        });
         form.resetForm({});
 
         if (data?.createComment.errors) {
           form.setErrors(toErrorMap(data.createComment.errors));
         } else if (!errors) {
-          fetchMore();
+          // fetchMore();
           return toast({
             position: 'bottom-left',
             duration: 3000,
