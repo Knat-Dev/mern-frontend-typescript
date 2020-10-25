@@ -33,7 +33,6 @@ import { withApollo } from '../utils/withApollo';
 
 const Index = () => {
   const { data, loading, fetchMore, variables } = usePostsQuery({
-    notifyOnNetworkStatusChange: false,
     variables: {
       input: {
         limit: 15,
@@ -41,6 +40,8 @@ const Index = () => {
       },
     },
   });
+
+  useEffect(() => console.log(data?.posts), [data?.posts]);
 
   let ErrorEl = (
     <Alert status="error">

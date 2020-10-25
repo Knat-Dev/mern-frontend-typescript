@@ -6,13 +6,15 @@ import { isServer } from '../utils/isServer';
 import Wrapper from './Wrapper';
 import SuccessToast from './SuccessToast';
 import { useApolloClient } from '@apollo/client';
+import { withApollo } from '../utils/withApollo';
 
 interface Props {}
 
 const Navbar: React.FC<Props> = ({}) => {
-  const { data, loading } = useMeQuery();
+  const { data, loading } = useMeQuery({ ssr: false });
   const [logout, { loading: logoutLoading }] = useLogoutMutation();
   const toast = useToast();
+
   useEffect(() => {
     console.log(data?.me);
   }, [data?.me]);

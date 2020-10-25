@@ -7,7 +7,7 @@ import {
 } from '@apollo/client';
 import { NextPageContext } from 'next';
 import { PaginatedComments, PaginatedPosts, Post } from '../generated/graphql';
-import { createWithApollo } from '../utils/createWithApollo';
+import { createWithApollo } from './createWithApollo';
 import { onError } from '@apollo/client/link/error';
 import Router from 'next/router';
 import { isServer } from './isServer';
@@ -33,7 +33,6 @@ const link = errorLink.concat(httpLink);
 
 const apolloClient = (ctx: NextPageContext) =>
   new ApolloClient({
-    ssrMode: isServer(),
     headers: {
       cookie:
         (typeof window === 'undefined' ? ctx?.req?.headers.cookie : '') || '',
