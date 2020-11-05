@@ -18,6 +18,7 @@ export type Query = {
   posts: PaginatedPosts;
   post?: Maybe<Post>;
   me?: Maybe<User>;
+  comments: PaginatedComments;
 };
 
 
@@ -28,6 +29,12 @@ export type QueryPostsArgs = {
 
 export type QueryPostArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryCommentsArgs = {
+  input: PaginationInput;
+  postId: Scalars['String'];
 };
 
 export type PaginatedPosts = {
@@ -64,6 +71,7 @@ export type User = {
   createdAt: Scalars['Float'];
   posts: Array<Post>;
   updatedAt: Scalars['Float'];
+  tokenVersion: Scalars['Float'];
 };
 
 export type PaginatedComments = {
@@ -179,6 +187,7 @@ export type PostInput = {
 
 export type UserResponse = {
   __typename?: 'UserResponse';
+  accessToken?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<FieldError>>;
   user?: Maybe<User>;
 };
