@@ -15,3 +15,6 @@ For the fullstack live demo click [here](https://reddit.knat.dev)
 * Cookies (JWT refresh token)
 * Chakra-UI - a growing Typescript UI Framework
 
+## Dev-Ops
+### Frontend
+* Vercel
