@@ -14,6 +14,14 @@ import cookie from 'cookie';
 import { getAccessToken, setAccessToken } from './accessToken';
 import { PaginatedComments, PaginatedPosts } from '../generated/graphql';
 
+const apiAddress =
+  process.env.NODE_ENV === 'production'
+    ? 'https://api.knat.dev/api'
+    : 'http://localhost:8080/api';
+const refreshAddress =
+  process.env.NODE_ENV === 'production'
+    ? 'https://api.knat.dev/refresh'
+    : 'http://localhost:8080/refresh';
 const isServer = () => typeof window === 'undefined';
 
 /**
@@ -64,7 +72,7 @@ export function withApollo(PageComponent: any, { ssr = true } = {}) {
       if (isServer()) {
         const cookies = cookie.parse(req.headers.cookie ?? '');
         if (cookies.qid) {
-          const response = await fetch('http://localhost:8080/refresh', {
+          const response = await fetch(refreshAddress, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -166,7 +174,7 @@ function initApolloClient(initState: any, serverAccessToken?: string) {
  */
 function createApolloClient(initialState = {}, serverAccessToken?: string) {
   const httpLink = new HttpLink({
-    uri: 'http://localhost:8080/api',
+    uri: apiAddress,
     credentials: 'include',
     fetch,
   });
@@ -192,7 +200,7 @@ function createApolloClient(initialState = {}, serverAccessToken?: string) {
       }
     },
     fetchAccessToken: () => {
-      return fetch('http://localhost:8080/refresh', {
+      return fetch(refreshAddress, {
         method: 'POST',
         credentials: 'include',
       });

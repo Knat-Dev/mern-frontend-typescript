@@ -21,6 +21,7 @@ import { withApollo } from '../utils/ApolloClient';
 
 const Index = () => {
   const { data, loading, fetchMore, variables } = usePostsQuery({
+    // notifyOnNetworkStatusChange: true,
     variables: {
       input: {
         limit: 15,
