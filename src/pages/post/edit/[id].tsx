@@ -2,7 +2,7 @@ import { useApolloClient } from '@apollo/client';
 import { Box, Button, Spinner, useToast } from '@chakra-ui/core';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React from 'react';
 import InputField from '../../../components/InputField';
 import Layout from '../../../components/Layout';
 import SuccessToast from '../../../components/SuccessToast';
@@ -11,7 +11,6 @@ import {
   useUpdatePostMutation,
 } from '../../../generated/graphql';
 import { toErrorMap } from '../../../utils/toErrorMap';
-import { withApollo } from '../../../utils/withApollo';
 
 interface Props {}
 
@@ -20,10 +19,6 @@ const EditPost: React.FC<Props> = () => {
   const client = useApolloClient();
   const id = typeof router.query.id === 'string' ? router.query.id : '';
   const [updatePost] = useUpdatePostMutation();
-  const [input, setInput] = useState({
-    limit: 4,
-    cursor: null as null | number | undefined,
-  });
 
   const { data, error, loading } = usePostQuery({
     skip: id === '',

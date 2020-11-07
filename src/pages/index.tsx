@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/core';
 import Head from 'next/head';
 import NextLink from 'next/link';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Layout from '../components/Layout';
 import PostItem from '../components/PostItem';
 import { usePostsQuery } from '../generated/graphql';

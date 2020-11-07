@@ -1,4 +1,4 @@
-import { Flex, Icon, Heading, CloseButton, Text } from '@chakra-ui/core';
+import { CloseButton, Flex, Heading, Icon, Text } from '@chakra-ui/core';
 import React from 'react';
 
 interface Props {

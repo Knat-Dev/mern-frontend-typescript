@@ -1,29 +1,14 @@
-import {
-  Box,
-  Button,
-  CloseButton,
-  Flex,
-  Heading,
-  Icon,
-  IconButton,
-  Link,
-  SimpleGrid,
-  Text,
-  useToast,
-} from '@chakra-ui/core';
-import { Formik, Form } from 'formik';
-import { withUrqlClient } from 'next-urql';
+import { Box, Button, Flex, Heading, Link, useToast } from '@chakra-ui/core';
+import { Form, Formik } from 'formik';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import InputField from '../components/InputField';
+import SuccessToast from '../components/SuccessToast';
 import Wrapper from '../components/Wrapper';
 import { MeDocument, MeQuery, useLoginMutation } from '../generated/graphql';
-import { createUrqlClient } from '../utils/createUrqlClient';
-import { toErrorMap } from '../utils/toErrorMap';
-import NextLink from 'next/link';
-import SuccessToast from '../components/SuccessToast';
 import { setAccessToken } from '../utils/accessToken';
-import { withApollo } from '../utils/ApolloClient';
+import { toErrorMap } from '../utils/toErrorMap';
 
 interface Props {}
 
@@ -137,4 +122,4 @@ const Login: React.FC<Props> = ({}) => {
   );
 };
 
-export default withApollo(Login, { ssr: false });
+export default Login;

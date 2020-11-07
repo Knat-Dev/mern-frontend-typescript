@@ -1,18 +1,14 @@
 import { Box, Button, Flex, Heading, Link, useToast } from '@chakra-ui/core';
-import React, { useEffect } from 'react';
 import NextLink from 'next/link';
+import React, { useEffect } from 'react';
 import {
   MeDocument,
   MeQuery,
   useLogoutMutation,
   useMeQuery,
 } from '../generated/graphql';
-import { isServer } from '../utils/isServer';
-import Wrapper from './Wrapper';
-import SuccessToast from './SuccessToast';
-import { useApolloClient } from '@apollo/client';
-import { withApollo } from '../utils/withApollo';
 import { setAccessToken } from '../utils/accessToken';
+import SuccessToast from './SuccessToast';
 
 interface Props {}
 

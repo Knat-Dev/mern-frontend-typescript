@@ -1,17 +1,14 @@
-import { ApolloCache, Cache, gql } from '@apollo/client';
+import { ApolloCache, gql } from '@apollo/client';
 import { Flex, IconButton, Text } from '@chakra-ui/core';
 import React, { useState } from 'react';
 import {
   Post,
-  PostQuery,
   PostsQuery,
   RegularCommentFragment,
-  useMeQuery,
   useVoteCommentMutation,
   useVoteMutation,
   VoteCommentMutation,
   VoteMutation,
-  VoteMutationVariables,
 } from '../generated/graphql';
 
 interface Props {

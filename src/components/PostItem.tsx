@@ -1,19 +1,10 @@
-import {
-  Flex,
-  Box,
-  Heading,
-  Link,
-  Text,
-  IconButton,
-  Icon,
-} from '@chakra-ui/core';
+import { Box, Flex, Heading, Icon, Link, Text } from '@chakra-ui/core';
 import moment from 'moment';
-import React, { useEffect } from 'react';
-import { PostsQuery } from '../generated/graphql';
-import VotingComponent from './VotingComponent';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import React from 'react';
+import { PostsQuery } from '../generated/graphql';
 import EditDeleteButtons from './EditDeleteButtons';
+import VotingComponent from './VotingComponent';
 
 interface Props {
   post: PostsQuery['posts']['posts'][0];

@@ -1,18 +1,13 @@
 import { Box, Button, Heading, useToast } from '@chakra-ui/core';
-import { Formik, Form } from 'formik';
-import { withUrqlClient } from 'next-urql';
+import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import InputField from '../components/InputField';
 import Layout from '../components/Layout';
 import SuccessToast from '../components/SuccessToast';
-import Wrapper from '../components/Wrapper';
-import { useCreatePostMutation, useMeQuery } from '../generated/graphql';
-import { createUrqlClient } from '../utils/createUrqlClient';
+import { useCreatePostMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useIsAuth } from '../utils/useIsAuth';
-import { withApollo } from '../utils/withApollo';
-import forgotPassword from './forgot-password';
 
 const CreatePost = () => {
   useIsAuth();

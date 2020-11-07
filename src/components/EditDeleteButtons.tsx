@@ -2,7 +2,6 @@ import { Box, IconButton, useToast } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 import React from 'react';
 import {
-  PostQuery,
   PostsQuery,
   useDeletePostMutation,
   useMeQuery,

@@ -1,29 +1,8 @@
-import {
-  Button,
-  Flex,
-  Heading,
-  Input,
-  InputGroup,
-  InputRightElement,
-  List,
-  ListItem,
-  Text,
-  useToast,
-} from '@chakra-ui/core';
-import { Formik, Form } from 'formik';
+import { Flex, Heading, List, ListItem, Text } from '@chakra-ui/core';
 import moment from 'moment';
-import React, { useState } from 'react';
-import {
-  CommentResponse,
-  PaginationInput,
-  PostQuery,
-  RegularCommentFragment,
-  useCreateCommentMutation,
-} from '../generated/graphql';
-import login from '../pages/login';
-import { toErrorMap } from '../utils/toErrorMap';
+import React from 'react';
+import { RegularCommentFragment } from '../generated/graphql';
 import CreateComment from './CreateComment';
-import SuccessToast from './SuccessToast';
 import VotingComponent from './VotingComponent';
 
 interface Props {

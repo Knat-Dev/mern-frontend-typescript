@@ -1,20 +1,16 @@
-import { gql } from '@apollo/client';
 import {
-  InputGroup,
-  Input,
-  InputRightElement,
   Button,
-  useToast,
-  FormErrorMessage,
   FormControl,
+  FormErrorMessage,
+  Input,
+  InputGroup,
+  InputRightElement,
+  useToast,
 } from '@chakra-ui/core';
-import { Formik, Form } from 'formik';
+import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
 import {
-  CommentsDocument,
-  CreateCommentDocument,
-  PaginationInput,
   RegularCommentFragmentDoc,
   useCreateCommentMutation,
   useMeQuery,

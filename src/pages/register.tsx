@@ -1,26 +1,13 @@
-import React from 'react';
+import { Box, Button, Flex, Heading, Link, useToast } from '@chakra-ui/core';
 import { Form, Formik } from 'formik';
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Input,
-  Link,
-  useToast,
-} from '@chakra-ui/core';
-import Wrapper from '../components/Wrapper';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import React from 'react';
 import InputField from '../components/InputField';
-import { useMutation } from 'urql';
+import SuccessToast from '../components/SuccessToast';
+import Wrapper from '../components/Wrapper';
 import { MeDocument, MeQuery, useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
-import { useRouter } from 'next/router';
-import NextLink from 'next/link';
-import SuccessToast from '../components/SuccessToast';
-import { withApollo } from '../utils/withApollo';
 interface Props {}
 
 const Register: React.FC<Props> = ({}) => {
