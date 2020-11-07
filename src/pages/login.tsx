@@ -22,7 +22,8 @@ import { createUrqlClient } from '../utils/createUrqlClient';
 import { toErrorMap } from '../utils/toErrorMap';
 import NextLink from 'next/link';
 import SuccessToast from '../components/SuccessToast';
-import { withApollo } from '../utils/withApollo';
+import { setAccessToken } from '../utils/accessToken';
+import { withApollo } from '../utils/ApolloClient';
 
 interface Props {}
 
@@ -38,7 +39,9 @@ const Login: React.FC<Props> = ({}) => {
         onSubmit={async (values, { setErrors }) => {
           const response = await login({
             variables: { input: values },
-            update: (cache, { data }) => {
+            update: async (cache, { data }) => {
+              console.log(data);
+              setAccessToken(data?.login.accessToken);
               cache.reset();
               cache.writeQuery<MeQuery>({
                 query: MeDocument,
@@ -47,8 +50,6 @@ const Login: React.FC<Props> = ({}) => {
                   me: data?.login.user,
                 },
               });
-              // cache.evict({ fieldName: 'posts:{}' });
-              // cache.evict({ fieldName: 'comments:', args: { postId: {} } });
             },
           });
           if (response.data?.login.errors) {
@@ -136,4 +137,4 @@ const Login: React.FC<Props> = ({}) => {
   );
 };
 
-export default withApollo({ ssr: false })(Login);
+export default withApollo(Login, { ssr: false });

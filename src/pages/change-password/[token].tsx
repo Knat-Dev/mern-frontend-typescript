@@ -22,13 +22,18 @@ import { createUrqlClient } from '../../utils/createUrqlClient';
 import { toErrorMap } from '../../utils/toErrorMap';
 import NextLink from 'next/link';
 import login from '../login';
+import { setAccessToken } from '../../utils/accessToken';
 
 interface Props {}
 
-const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
+const ChangePassword: NextPage<{ token: string }> = () => {
   const router = useRouter();
   const [tokenError, setTokenError] = useState('');
   const [changePassword] = useChangePasswordMutation();
+  const token =
+    typeof router.query.token === 'string' ? router.query.token : '';
+
+  if (!token) router.replace('/');
 
   return (
     <Wrapper variant="small" horizontalCenter>
@@ -43,8 +48,11 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
             if ('token' in errorMap) {
               setTokenError(errorMap['token']);
             }
-            setErrors(errorMap);
-          } else router.push('/');
+            return setErrors(errorMap);
+          } else {
+            setAccessToken(response.data?.changePassword.accessToken);
+            return router.push('/');
+          }
         }}
       >
         {({ isSubmitting }) => (
@@ -90,9 +98,5 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
     </Wrapper>
   );
 };
-ChangePassword.getInitialProps = ({ query }) => {
-  return {
-    token: query.token as string,
-  };
-};
+
 export default ChangePassword;

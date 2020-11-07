@@ -1,8 +1,9 @@
 fragment RegularResponse on UserResponse {
-    errors {
-        ...RegularError
-    }
-    user {
-        ...RegularUser
-    }
+  accessToken
+  errors {
+    ...RegularError
+  }
+  user {
+    ...RegularUser
+  }
 }

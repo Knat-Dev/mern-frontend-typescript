@@ -55,13 +55,22 @@ const EditPost: React.FC<Props> = () => {
       <Formik
         initialValues={{ id, title: data.post.title, text: data.post.text }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await updatePost({ variables: values });
+          const response = await updatePost({
+            variables: values,
+            update: (cache) => {
+              cache.modify({
+                fields: {
+                  post() {}, // update the post
+                },
+              });
+            },
+          });
           if (
             !response.data?.updatePost?.errors &&
             !response.errors &&
             response.data?.updatePost?.post
           ) {
-            console.log(client.cache.evict({ id: 'Post:' + id }));
+            // console.log(client.cache.evict({ id: 'Post:' + id }));
             await router.push('/');
             return toast({
               position: 'bottom-left',
@@ -113,4 +122,4 @@ const EditPost: React.FC<Props> = () => {
   );
 };
 
-export default withApollo({ ssr: true })(EditPost);
+export default EditPost;

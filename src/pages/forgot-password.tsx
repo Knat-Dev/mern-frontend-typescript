@@ -91,4 +91,4 @@ const ForgotPassword: React.FC<Props> = (props) => {
   );
 };
 
-export default withApollo({ ssr: false })(ForgotPassword);
+export default ForgotPassword;

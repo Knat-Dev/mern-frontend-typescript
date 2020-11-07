@@ -91,4 +91,4 @@ const CreatePost = () => {
   );
 };
 
-export default withApollo({ ssr: false })(CreatePost);
+export default CreatePost;

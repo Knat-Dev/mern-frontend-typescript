@@ -1,17 +1,23 @@
 import { Box, Button, Flex, Heading, Link, useToast } from '@chakra-ui/core';
 import React, { useEffect } from 'react';
 import NextLink from 'next/link';
-import { useLogoutMutation, useMeQuery } from '../generated/graphql';
+import {
+  MeDocument,
+  MeQuery,
+  useLogoutMutation,
+  useMeQuery,
+} from '../generated/graphql';
 import { isServer } from '../utils/isServer';
 import Wrapper from './Wrapper';
 import SuccessToast from './SuccessToast';
 import { useApolloClient } from '@apollo/client';
 import { withApollo } from '../utils/withApollo';
+import { setAccessToken } from '../utils/accessToken';
 
 interface Props {}
 
 const Navbar: React.FC<Props> = ({}) => {
-  const { data, loading } = useMeQuery({ ssr: false });
+  const { data, loading } = useMeQuery();
   const [logout, { loading: logoutLoading }] = useLogoutMutation();
   const toast = useToast();
 
@@ -48,7 +54,12 @@ const Navbar: React.FC<Props> = ({}) => {
           onClick={async () => {
             const { errors } = await logout({
               update: (cache) => {
-                cache.evict({ fieldName: 'me' });
+                setAccessToken('');
+                console.log('logging out');
+                cache.writeQuery<MeQuery>({
+                  query: MeDocument,
+                  data: { me: null },
+                });
                 // cache.evict({ fieldName: 'posts:{}' });
                 cache.reset();
               },

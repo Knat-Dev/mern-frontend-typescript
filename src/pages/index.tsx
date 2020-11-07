@@ -9,27 +9,15 @@ import {
   CloseButton,
   Flex,
   Heading,
-  Icon,
-  IconButton,
-  Link,
   Stack,
-  Text,
 } from '@chakra-ui/core';
-import moment from 'moment';
-import { withUrqlClient } from 'next-urql';
-import Layout from '../components/Layout';
-import Navbar from '../components/Navbar';
-import { PostQuery, PostsQuery, usePostsQuery } from '../generated/graphql';
-import { createUrqlClient } from '../utils/createUrqlClient';
-import NextLink from 'next/link';
-import React, { useEffect, useState } from 'react';
-import { Variables, NullArray, Resolver } from '@urql/exchange-graphcache';
-import { stringifyVariables } from 'urql';
-import VotingComponent from '../components/VotingComponent';
-import PostItem from '../components/PostItem';
 import Head from 'next/head';
-import Wrapper from '../components/Wrapper';
-import { withApollo } from '../utils/withApollo';
+import NextLink from 'next/link';
+import React, { useEffect } from 'react';
+import Layout from '../components/Layout';
+import PostItem from '../components/PostItem';
+import { usePostsQuery } from '../generated/graphql';
+import { withApollo } from '../utils/ApolloClient';
 
 const Index = () => {
   const { data, loading, fetchMore, variables } = usePostsQuery({
@@ -40,8 +28,6 @@ const Index = () => {
       },
     },
   });
-
-  useEffect(() => console.log(data?.posts), [data?.posts]);
 
   let ErrorEl = (
     <Alert status="error">
@@ -144,4 +130,4 @@ const Index = () => {
   );
 };
 
-export default withApollo({ ssr: true })(Index);
+export default withApollo(Index, { ssr: true });

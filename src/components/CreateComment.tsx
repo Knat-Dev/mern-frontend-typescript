@@ -47,18 +47,13 @@ const CreateComment: React.FC<Props> = ({ postId, fetchMore }) => {
             cache.modify({
               fields: {
                 comments(existingComments = []) {
-                  console.log(existingComments);
-                  console.log(data);
                   const addedComment = data?.createComment.comment;
-                  console.log(addedComment);
+
                   const doc = cache.writeFragment({
                     fragment: RegularCommentFragmentDoc,
                     data: addedComment,
                   });
-                  console.log({
-                    ...existingComments,
-                    comments: [doc, ...existingComments.comments],
-                  });
+
                   return {
                     ...existingComments,
                     comments: [doc, ...existingComments.comments],

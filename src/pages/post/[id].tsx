@@ -1,29 +1,24 @@
 import { Box, Button, CircularProgress, Spinner } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Comments from '../../components/Comments';
 import Layout from '../../components/Layout';
 import PostItem from '../../components/PostItem';
 import {
-  PostsQuery,
+  PaginationInput,
   useCommentsQuery,
   usePostQuery,
 } from '../../generated/graphql';
-import { withApollo } from '../../utils/withApollo';
 
-interface Props {
-  post: PostsQuery['posts']['posts'][0];
-}
-
-const Post: React.FC<Props> = ({ post }) => {
+const Post: React.FC = () => {
   const router = useRouter();
   const id = typeof router.query.id === 'string' ? router.query.id : '';
-  // const [input, setInput] = useState<PaginationInput>({
-  //   limit: 4,
-  //   cursor: null,
-  // });
+  const [input, setInput] = useState<PaginationInput>({
+    limit: 4,
+    cursor: null,
+  });
 
-  const { data, error, loading } = usePostQuery({
+  const { data, loading } = usePostQuery({
     skip: id === '',
     variables: {
       id,
@@ -35,8 +30,9 @@ const Post: React.FC<Props> = ({ post }) => {
     fetchMore,
     variables,
   } = useCommentsQuery({
+    notifyOnNetworkStatusChange: true,
     skip: id === '',
-    variables: { postId: id, input: { limit: 4, cursor: null } },
+    variables: { postId: id, input },
   });
 
   useEffect(() => {
@@ -120,4 +116,4 @@ const Post: React.FC<Props> = ({ post }) => {
   );
 };
 
-export default withApollo({ ssr: false })(Post);
+export default Post;

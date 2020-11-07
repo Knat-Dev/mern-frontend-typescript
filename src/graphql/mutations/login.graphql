@@ -1,5 +1,9 @@
 mutation Login($input: LoginInput!) {
-    login(input: $input) {
-        ...RegularResponse
+  login(input: $input) {
+    accessToken
+    errors {
+      field
     }
+    ...RegularResponse
+  }
 }
