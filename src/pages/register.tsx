@@ -7,6 +7,7 @@ import InputField from '../components/InputField';
 import SuccessToast from '../components/SuccessToast';
 import Wrapper from '../components/Wrapper';
 import { MeDocument, MeQuery, useRegisterMutation } from '../generated/graphql';
+import { setAccessToken } from '../utils/accessToken';
 import { toErrorMap } from '../utils/toErrorMap';
 interface Props {}
 
@@ -23,6 +24,7 @@ const Register: React.FC<Props> = ({}) => {
           const response = await register({
             variables: { input: values },
             update: (cache, { data }) => {
+              setAccessToken(data?.register.accessToken);
               cache.writeQuery<MeQuery>({
                 query: MeDocument,
                 data: {
@@ -30,7 +32,7 @@ const Register: React.FC<Props> = ({}) => {
                   me: data?.register.user,
                 },
               });
-              cache.evict({ fieldName: 'posts:{}' });
+              // cache.evict({ fieldName: 'posts:{}' });
             },
           });
           if (response.data?.register.errors) {
